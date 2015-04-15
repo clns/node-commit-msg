@@ -1,0 +1,76 @@
+# How to contribute
+
+Read the [Contributing to a Project](https://guides.github.com/activities/contributing-to-open-source/#contributing)
+GitHub guide.
+
+## Commit Message
+
+A good commit message should answer three questions:
+
+1. **Why is it necessary?** It may fix a bug, add a feature, improve
+performance, reliability, stability, or just be a change for the sake
+of correctness.
+2. **How does it address the issue?** For short obvious patches this part
+can be omitted, but it should be a high level description of what the
+approach was.
+3. **What effects does the patch have?** (In addition to the obvious ones,
+this may include benchmarks, side effects, etc.)
+
+Structure your commit message like this:
+
+```
+Capitalized, short (50 chars or less) summary
+
+More detailed explanatory text, if necessary.  Wrap it to about 72
+characters or so.  In some contexts, the first line is treated as the
+subject of an email and the rest of the text as the body.  The blank
+line separating the summary from the body is critical (unless you omit
+the body entirely); tools like rebase can get confused if you run the
+two together.
+
+Write your commit message in the imperative: "Fix bug" and not "Fixed bug"
+or "Fixes bug."  This convention matches up with commit messages generated
+by commands like git merge and git revert.
+
+Further paragraphs come after blank lines.
+
+- Bullet points are okay, too
+
+- Typically a hyphen or asterisk is used for the bullet, followed by a
+  single space, with blank lines in between, but conventions vary here
+
+- Use a hanging indent
+
+Fixes #5678 (commit will be linked to the issue, which will be marked
+as resolved when pushing the commit).
+```
+
+**DO**
+
+- Use the present tense ("Add feature" not "Added feature").
+- Use the imperative mode ("Move cursor to..." not "Moves cursor to...").
+- Limit the first line to [50 characters or less](http://stopwritingramblingcommitmessages.com/).
+- Always leave the second line blank (if there's more than just the title).
+- Line break the commit message (to make the commit message readable without
+having to scroll horizontally).
+- Reference issues and pull requests liberally.
+
+**DON'T**
+
+- Don't end the summary line with a period - it's a title and titles don't end
+with a period.
+- Never use the `-m <msg>`/`--message=<msg>` flag to `git commit`; it gives you
+a poor mindset as you will feel that you have to fit your commit message into
+the terminal command, and makes the commit feel more like a one-off argument
+than a page in history.
+
+**Tips**
+
+- If it seems difficult to summarize what your commit does, it may be because
+it includes several logical changes or bug fixes, and are better split up into
+several commits using `git add -p`.
+
+**References**
+
+- Tim Pope's [A Note About Git Commit Messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
+- [Linux kernel suggestion](http://stackoverflow.com/a/11993051/1104534) on SO

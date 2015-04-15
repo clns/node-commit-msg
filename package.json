@@ -1,0 +1,30 @@
+{
+  "name": "commit-msg",
+  "version": "1.0.0",
+  "description": "Git commit message validator using best practices",
+  "main": "./lib/commit-message.js",
+  "scripts": {
+    "test": "mocha --reporter spec --slow 5 --check-leaks"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clns/node-commit-msg"
+  },
+  "keywords": [
+    "git",
+    "commit-msg",
+    "commit message",
+    "COMMIT_EDITMSG",
+    "validator",
+    "best practices"
+  ],
+  "author": "Calin Seciu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/clns/node-commit-msg/issues"
+  },
+  "homepage": "https://github.com/clns/node-commit-msg",
+  "devDependencies": {
+    "mocha": "^2.2.4"
+  }
+}
