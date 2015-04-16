@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var util = require('util');
+var path = require('path');
 var CommitMessage = require('..');
 
 var cfg = CommitMessage.prototype.config;
@@ -61,6 +62,12 @@ var cases = [
         '\nBody starting with newline'],
         errors: ['Commit message is not in the correct format, see\n'+
         'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message'],
+        warnings: []
+    },
+    {
+        describe: 'starting with a lowercase letter',
+        in: ['commit message with lowercase first letter'],
+        errors: ['Commit message should start with a capitalized letter'],
         warnings: []
     },
     {
@@ -131,5 +138,28 @@ describe('CommitMessage', function() {
         }); // end forEach
 
     }); // end #parse()
+
+    describe('#parseFromFile', function() {
+        describe('valid file', function() {
+            var file = path.resolve(__dirname, './COMMIT_EDITMSG');
+            var message = CommitMessage.parseFromFile(file);
+            var failMsg = 'Fail to read from ' + path.relative(
+                path.resolve(__dirname, '..'), file
+            );
+
+            it('should have 0 errors', function() {
+                assert.deepEqual(message._errors, [], failMsg);
+            });
+
+            it('should have 0 warnings', function() {
+                assert.deepEqual(message._warnings, [], failMsg);
+            });
+
+            it('should have the correct title', function() {
+                assert.equal(message._title,
+                    'Fix broken crypto_register_instance() module', failMsg);
+            });
+        });
+    });
 
 }); // end CommitMessage
