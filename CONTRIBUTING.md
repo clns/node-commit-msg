@@ -74,3 +74,4 @@ several commits using `git add -p`.
 
 - Tim Pope's [A Note About Git Commit Messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
 - [Linux kernel suggestion](http://stackoverflow.com/a/11993051/1104534) on SO
+- Linus Torvalds' [commit message guidelines](https://github.com/torvalds/linux/pull/17#issuecomment-5659933)
