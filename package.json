@@ -1,9 +1,13 @@
 {
   "name": "commit-msg",
   "version": "1.0.0",
-  "description": "Git commit message validator using best practices",
+  "description": "Git commit-msg hook using best practices",
   "main": "./lib/commit-message.js",
   "scripts": {
+    "hook": "node lib/setup",
+    "hook-uninstall": "node lib/setup uninstall",
+    "postinstall": "npm run hook",
+    "preuninstall": "npm run hook-uninstall",
     "test": "mocha --reporter spec --slow 5 --check-leaks"
   },
   "repository": {
@@ -12,9 +16,11 @@
   },
   "keywords": [
     "git",
+    "hook",
     "commit-msg",
     "commit message",
     "COMMIT_EDITMSG",
+    "parser",
     "validator",
     "best practices"
   ],
@@ -26,5 +32,8 @@
   "homepage": "https://github.com/clns/node-commit-msg",
   "devDependencies": {
     "mocha": "^2.2.4"
+  },
+  "dependencies": {
+    "chalk": "^1.0.0"
   }
 }
