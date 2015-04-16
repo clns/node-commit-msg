@@ -1,0 +1,14 @@
+Fix broken crypto_register_instance() module
+
+Commit 9c521a2 ("crypto: api - remove instance when test failed")
+tried to grab a module reference count before the module was even set.
+
+Worse, it then goes on to free the module reference count after it is
+set so you quickly end up with a negative module reference count which
+prevents people from using any instances belonging to that module.
+
+This patch moves the module initialization before the reference count.
+
+Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
