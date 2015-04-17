@@ -125,7 +125,7 @@ describe('CommitMessage', function() {
                     assert.deepEqual(message._warnings, t.warnings, failMsg);
                 });
 
-                if (message.valid) {
+                if (message.valid && !t.errors.length) {
                     it('should have the correct title', function() {
                         // if (!message.valid) {
                         //     this.test.skip();
