@@ -94,6 +94,13 @@ var cases = [
         'not exceed %d characters, except for compiler error ' +
         'messages or other "non-prose" explanation',
         cfg.preferredBodyMaxLineLength, cfg.preferredBodyMaxLineLength)]
+    },
+    {
+        describe: 'no imperative present tense',
+        in: ['Changes profile picture delete feature'],
+        errors: [],
+        warnings: ['Detected \'Changes\' instead of \'Change\', use only imperative ' +
+        'present tense']
     }
 ];
 

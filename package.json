@@ -34,6 +34,7 @@
     "mocha": "^2.2.4"
   },
   "dependencies": {
-    "chalk": "^1.0.0"
+    "chalk": "^1.0.0",
+    "natural": "^0.2.1"
   }
 }
