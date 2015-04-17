@@ -100,7 +100,8 @@ var cases = [
         in: ['Changes profile picture delete feature'],
         errors: [],
         warnings: ['Detected \'Changes\' instead of \'Change\', use only imperative ' +
-        'present tense']
+        'present tense'],
+        skip: true
     }
 ];
 
@@ -114,31 +115,32 @@ describe('CommitMessage', function() {
             var failMsg = 'Message was:\n' + input;
             var errNo = t.errors.length;
             var warNo = t.warnings.length;
+            var itFn = t.skip ? it.skip : it;
 
             describe(t.describe, function() {
 
-                it(util.format('should have %d error(s)', errNo), function() {
+                itFn(util.format('should have %d error(s)', errNo), function() {
                     assert.deepEqual(message._errors, t.errors, failMsg);
                 });
 
-                it(util.format('should have %d warning(s)', warNo), function() {
+                itFn(util.format('should have %d warning(s)', warNo), function() {
                     assert.deepEqual(message._warnings, t.warnings, failMsg);
                 });
 
                 if (message.valid && !t.errors.length) {
-                    it('should have the correct title', function() {
+                    itFn('should have the correct title', function() {
                         // if (!message.valid) {
                         //     this.test.skip();
                         // }
                         assert.equal(message._title, t.in[0], failMsg);
                     });
 
-                    it('should have the correct body', function() {
+                    itFn('should have the correct body', function() {
                         assert.equal(message._body, t.in[1], failMsg);
                     });
 
-                    it('should validate imperative present tense');
-                    it('should identify github issues correctly');
+                    itFn('should validate imperative present tense');
+                    itFn('should identify github issues correctly');
                 }
 
             });
