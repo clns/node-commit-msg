@@ -79,7 +79,13 @@ var cases = [
     {
         describe: 'ending with a period',
         in: ['Commit message ending with a period.'],
-        errors: ['First line (summary) should not end with a period'],
+        errors: ['First line (summary) should not end with a period or whitespace'],
+        warnings: []
+    },
+    {
+        describe: 'ending with whitespace',
+        in: ['Commit message ending with a period '],
+        errors: ['First line (summary) should not end with a period or whitespace'],
         warnings: []
     },
     {
@@ -100,6 +106,18 @@ var cases = [
         'not exceed %d characters, except for compiler error ' +
         'messages or other "non-prose" explanation',
         cfg.preferredBodyMaxLineLength, cfg.preferredBodyMaxLineLength)]
+    },
+    {
+        describe: 'invalid whitespace (space)',
+        in: ['Commit  with 2 consecutive spaces'],
+        errors: ['First line (summary) contains invalid whitespace'],
+        warnings: []
+    },
+    {
+        describe: 'invalid whitespace (tab)',
+        in: ['Commit with\ttab'],
+        errors: ['First line (summary) contains invalid characters'],
+        warnings: []
     },
     {
         describe: 'no imperative present tense',
