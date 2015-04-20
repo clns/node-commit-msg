@@ -43,6 +43,12 @@ var cases = [
         warnings: []
     },
     {
+        describe: 'semver (tag) commit',
+        in: ['v1.0.0-alpha'],
+        errors: [],
+        warnings: []
+    },
+    {
         describe: 'empty commit',
         in: [''],
         errors: ['Commit message is not in the correct format, see\n'+
