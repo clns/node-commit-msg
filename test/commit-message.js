@@ -174,7 +174,7 @@ describe('CommitMessage', function() {
 
     describe('#parseFromFile', function() {
         describe('valid file', function() {
-            var file = path.resolve(__dirname, './COMMIT_EDITMSG');
+            var file = path.resolve(__dirname, 'resources/COMMIT_EDITMSG');
             var message = CommitMessage.parseFromFile(file);
             var failMsg = 'Fail to read from ' + path.relative(
                 path.resolve(__dirname, '..'), file

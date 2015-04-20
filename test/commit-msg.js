@@ -7,9 +7,9 @@ var execFileSync = require('child_process').execFileSync;
 var root = path.resolve(__dirname, '..');
 var hook = path.relative(root, 'bin/commit-msg');
 var validFile = path.relative(root,
-    path.resolve(__dirname, './COMMIT_EDITMSG'));
+    path.resolve(__dirname, 'resources/COMMIT_EDITMSG'));
 var invalidFile = path.relative(root,
-    path.resolve(__dirname, './COMMIT_EDITMSG-invalid'));
+    path.resolve(__dirname, 'resources/COMMIT_EDITMSG-invalid'));
 
 describe('commig-msg', function() {
 
