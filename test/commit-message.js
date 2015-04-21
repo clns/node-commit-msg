@@ -52,19 +52,25 @@ var cases = [
         Error.ERROR)]
     },
     {
-        describe: 'invalid format',
+        describe: 'title starting with newline',
         in: ['\nCommit message starting with newline'],
         errors: [new Error('Commit message is not in the correct format, see\n'+
         'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message',
         Error.ERROR)]
     },
     {
-        describe: 'invalid format',
+        describe: 'body starting with newline',
         in: ['Correct summary',
         '\nBody starting with newline'],
         errors: [new Error('Commit message is not in the correct format, see\n'+
         'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message',
         Error.ERROR)]
+    },
+    {
+        describe: 'exceeding title length limit',
+        in: ['Commit that exceeds the title length limit imposed by the config'],
+        errors: [new Error(util.format('First line (summary) should not exceed %d characters',
+        cfg.titleMaxLineLength[0]), Error.ERROR, [1, cfg.titleMaxLineLength[0]])]
     },
     {
         describe: 'starting with a lowercase letter',
