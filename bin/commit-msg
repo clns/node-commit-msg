@@ -8,15 +8,11 @@ var CommitMessage = require('..');
 var file = process.argv[2]; // usually '.git/COMMIT_EDITMSG'
 var message = CommitMessage.parseFromFile(file);
 
-if (message.hasWarnings) {
-    console.log('Commit message warnings:');
-    console.log(message.formattedWarnings);
+if (message.hasErrors() || message.hasWarnings()) {
+    console.log(message.formattedMessages);
 }
-if (!message.valid) {
-    console.error('Commit message errors:');
-    console.error(message.formattedErrors);
-
-    console.error('Commit aborted due to invalid commit message.');
+if (message.hasErrors()) {
+    console.error('Commit aborted due to invalid commit message (see above).');
     // https://nodejs.org/api/process.html#process_exit_codes
     process.exit(9); // Invalid Argument
 }

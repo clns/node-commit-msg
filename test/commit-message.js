@@ -4,6 +4,7 @@ var assert = require('assert');
 var util = require('util');
 var path = require('path');
 var CommitMessage = require('..');
+var Error = require('../lib/error');
 
 var cfg = CommitMessage.prototype.config;
 var cases = [
@@ -11,21 +12,18 @@ var cases = [
         describe: 'simple message',
         raw: 'Test commit\n',
         in: ['Test commit'],
-        errors: [],
-        warnings: []
+        errors: []
     },
     {
         describe: 'special characters',
         in: ['Test, (commit): with-\'special\' `characters.a`'],
-        errors: [],
-        warnings: []
+        errors: []
     },
     {
         describe: 'title and body',
         in: ['Test commit with body',
         'This is a commit body to explain the changes.'],
-        errors: [],
-        warnings: []
+        errors: []
     },
     {
         describe: 'title and lengthy body',
@@ -39,60 +37,58 @@ var cases = [
         ' - bullet point 2' +
         '\n\n' +
         ' - bullet point 3'],
-        errors: [],
-        warnings: []
+        errors: []
     },
     {
         describe: 'semver (tag) commit',
         in: ['v1.0.0-alpha'],
-        errors: [],
-        warnings: []
+        errors: []
     },
     {
         describe: 'empty commit',
         in: [''],
-        errors: ['Commit message is not in the correct format, see\n'+
-        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message'],
-        warnings: []
+        errors: [new Error('Commit message is not in the correct format, see\n'+
+        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message',
+        Error.ERROR)]
     },
     {
         describe: 'invalid format',
         in: ['\nCommit message starting with newline'],
-        errors: ['Commit message is not in the correct format, see\n'+
-        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message'],
-        warnings: []
+        errors: [new Error('Commit message is not in the correct format, see\n'+
+        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message',
+        Error.ERROR)]
     },
     {
         describe: 'invalid format',
         in: ['Correct summary',
         '\nBody starting with newline'],
-        errors: ['Commit message is not in the correct format, see\n'+
-        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message'],
-        warnings: []
+        errors: [new Error('Commit message is not in the correct format, see\n'+
+        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message',
+        Error.ERROR)]
     },
     {
         describe: 'starting with a lowercase letter',
         in: ['commit message with lowercase first letter'],
-        errors: ['Commit message should start with a capitalized letter'],
-        warnings: []
+        errors: [new Error('Commit message should start with a capitalized letter',
+        Error.ERROR, [1, 1])]
     },
     {
         describe: 'ending with a period',
         in: ['Commit message ending with a period.'],
-        errors: ['First line (summary) should not end with a period or whitespace'],
-        warnings: []
+        errors: [new Error('First line (summary) should not end with a period or whitespace',
+        Error.ERROR, [1, 36])]
     },
     {
         describe: 'ending with whitespace',
         in: ['Commit message ending with a period '],
-        errors: ['First line (summary) should not end with a period or whitespace'],
-        warnings: []
+        errors: [new Error('First line (summary) should not end with a period or whitespace',
+        Error.ERROR, [1, 36])]
     },
     {
         describe: 'invalid characters',
         in: ['Commit message with <invalid> chars'],
-        errors: ['First line (summary) contains invalid characters'],
-        warnings: []
+        errors: [new Error('First line (summary) contains invalid characters',
+        Error.ERROR, [1, 21])]
     },
     {
         describe: 'long body lines',
@@ -100,31 +96,30 @@ var cases = [
 'Commit body with very long lines that exceed the 72 characters limit imposed\n' +
 'by git commit message best practices. These practices include the linux kernel\n' +
 'and the git source.'],
-        errors: [],
-        warnings: [util.format('Lines 1, 2 in the commit body are ' +
+        errors: [new Error(util.format('Lines 1, 2 in the commit body are ' +
         'longer than %d characters. Body lines should ' +
         'not exceed %d characters, except for compiler error ' +
         'messages or other "non-prose" explanation',
-        cfg.preferredBodyMaxLineLength, cfg.preferredBodyMaxLineLength)]
+        cfg.bodyMaxLineLength[0], cfg.bodyMaxLineLength[0]),
+        Error.WARNING, [3, cfg.bodyMaxLineLength[0]])]
     },
     {
         describe: 'invalid whitespace (space)',
         in: ['Commit  with 2 consecutive spaces'],
-        errors: ['First line (summary) contains invalid whitespace'],
-        warnings: []
+        errors: [new Error('First line (summary) contains invalid whitespace',
+        Error.ERROR, [1, 7])]
     },
     {
         describe: 'invalid whitespace (tab)',
         in: ['Commit with\ttab'],
-        errors: ['First line (summary) contains invalid characters'],
-        warnings: []
+        errors: [new Error('First line (summary) contains invalid characters',
+        Error.ERROR, [1, 12])]
     },
     {
         describe: 'no imperative present tense',
         in: ['Changes profile picture delete feature'],
-        errors: [],
-        warnings: ['Detected \'Changes\' instead of \'Change\', use only imperative ' +
-        'present tense'],
+        errors: [new Error('Detected \'Changes\' instead of \'Change\', use ' +
+        'only imperative present tense', Error.WARNING)],
         skip: true
     }
 ];
@@ -138,8 +133,8 @@ describe('CommitMessage', function() {
             var message = CommitMessage.parse(input);
             var failMsg = 'Message was:\n' + input;
             var errNo = t.errors.length;
-            var warNo = t.warnings.length;
             var itFn = t.skip ? it.skip : it;
+            var expectErrors = !t.errors.every(function(e) { return !e.is(Error.ERROR); });
 
             describe(t.describe, function() {
 
@@ -147,15 +142,8 @@ describe('CommitMessage', function() {
                     assert.deepEqual(message._errors, t.errors, failMsg);
                 });
 
-                itFn(util.format('should have %d warning(s)', warNo), function() {
-                    assert.deepEqual(message._warnings, t.warnings, failMsg);
-                });
-
-                if (message.valid && !t.errors.length) {
+                if (!message.hasErrors() && !expectErrors) {
                     itFn('should have the correct title', function() {
-                        // if (!message.valid) {
-                        //     this.test.skip();
-                        // }
                         assert.equal(message._title, t.in[0], failMsg);
                     });
 
@@ -176,7 +164,7 @@ describe('CommitMessage', function() {
         describe('valid file', function() {
             var file = path.resolve(__dirname, 'resources/COMMIT_EDITMSG');
             var message = CommitMessage.parseFromFile(file);
-            var failMsg = 'Fail to read from ' + path.relative(
+            var failMsg = 'Message read from ' + path.relative(
                 path.resolve(__dirname, '..'), file
             );
 
@@ -184,13 +172,9 @@ describe('CommitMessage', function() {
                 assert.deepEqual(message._errors, [], failMsg);
             });
 
-            it('should have 0 warnings', function() {
-                assert.deepEqual(message._warnings, [], failMsg);
-            });
-
             it('should have the correct title', function() {
                 assert.equal(message._title,
-                    'Fix broken crypto_register_instance() module', failMsg);
+                    'Fix broken crypto_register_instance() module');
             });
         });
     });
