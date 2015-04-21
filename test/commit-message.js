@@ -45,6 +45,11 @@ var cases = [
         errors: []
     },
     {
+        describe: 'type: component: Prefix',
+        in: ['fix: i18n: Change login button text for spanish language'],
+        errors: []
+    },
+    {
         describe: 'empty commit',
         in: [''],
         errors: [new Error('Commit message is not in the correct format, see\n'+
