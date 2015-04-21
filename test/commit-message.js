@@ -16,7 +16,7 @@ var cases = [
     },
     {
         describe: 'special characters',
-        in: ['Test, (commit): with-\'special\' `characters.a`'],
+        in: ['Commit with special chars: ./`,()\'_3-'],
         errors: []
     },
     {
