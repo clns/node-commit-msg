@@ -24,7 +24,12 @@ var repos = [
     // {
     //     repo: 'clns/node-commit-msg',
     //     limit: 60
-    // },
+    // }
+    // {
+    //     repo: 'tpope/vim-pathogen',
+    //     limit: 30,
+    //     useExceptions: true
+    // }
     // {
     //     repo: 'git/git',
     //     limit: 30, // how many (latest) commits to test
@@ -43,6 +48,14 @@ var repos = [
 var cfg = CommitMessage.prototype.config;
 var originalCfg = clone(cfg);
 var exceptions = [
+    // tpope/vim-pathogen
+    'Use $VIMBLACKLIST to temporarily disable bundles', // body starts with indent
+    'pathogen.vim 2.3',
+    'pathogen#slash() alias for pathogen#separator()',
+    'pathogen.vim 2.2',
+    'pathogen.vim 2.1',
+    'Automatic lcd on :Vsplit, etc.',
+    'pathogen.vim 2.0',
     // git/git repo
     "l10n: de.po: translate 'symbolic link' as 'symbolische Verknüpfung'",
     'Sync with 2.3.5', // body doesn't start with capitalized letter
@@ -93,7 +106,7 @@ describe('external#github', function() {
 
     repos.forEach(function(repo) {
         describe(repo.repo, function() {
-            this.timeout(5000);
+            this.timeout(8000);
 
             var ct = 0;
             var limit = repo.limit;
