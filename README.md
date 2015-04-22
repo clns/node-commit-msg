@@ -99,7 +99,7 @@ You can also run the validator against external repositories from GitHub
 that are known for using good commit messages. Note that these requests
 will count against your GitHub
 [Rate Limiting](https://developer.github.com/v3/#rate-limiting) policy.  
-For example, the following command will run against the last commits
+For example, the following command will run against the latest commits
 from repositories like [git/git](https://github.com/git/git/commits/master)
 and [torvalds/linux](https://github.com/torvalds/linux/commits/master):
 
