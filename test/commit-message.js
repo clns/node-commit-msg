@@ -78,8 +78,14 @@ var cases = [
         Error.ERROR)]
     },
     {
-        describe: 'exceeding title length limit',
-        in: ['Commit that exceeds the title length limit imposed by the config'],
+        describe: 'exceeding title length soft limit',
+        in: ['Commit that exceeds the title length soft limit imposed by the config'],
+        errors: [new Error(util.format('First line (summary) should not exceed %d characters',
+        cfg.titlePreferredMaxLineLength[0]), Error.WARNING, [1, cfg.titlePreferredMaxLineLength[0]])]
+    },
+    {
+        describe: 'exceeding title length hard limit',
+        in: ['Commit that exceeds the title length hard limit imposed by the configuration'],
         errors: [new Error(util.format('First line (summary) should not exceed %d characters',
         cfg.titleMaxLineLength[0]), Error.ERROR, [1, cfg.titleMaxLineLength[0]])]
     },
