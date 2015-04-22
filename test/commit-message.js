@@ -154,11 +154,11 @@ var cases = [
         Error.WARNING, [3, 7])]
     },
     {
-        describe: 'no imperative present tense',
+        describe: 'non-imperative tense',
         in: ['Changes profile picture delete feature'],
-        errors: [new Error('Detected \'Changes\' instead of \'Change\', use ' +
-        'only imperative present tense', Error.WARNING)],
-        skip: true
+        errors: [new Error('Use imperative present tense, eg. "Fix bug" not ' +
+        '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
+        'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.WARNING, [1, 1])]
     }
 ];
 
@@ -188,9 +188,6 @@ describe('CommitMessage', function() {
                     itFn('should have the correct body', function() {
                         assert.equal(message._body, t.in[1], failMsg);
                     });
-
-                    itFn('should validate imperative present tense');
-                    itFn('should identify github issues correctly');
                 }
 
             });
