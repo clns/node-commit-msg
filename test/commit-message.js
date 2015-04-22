@@ -50,6 +50,12 @@ var cases = [
         errors: []
     },
     {
+        describe: 'issue reference',
+        in: ['Commit with issue ref',
+        'Fixes github/github#12'],
+        errors: []
+    },
+    {
         describe: 'empty commit',
         in: [''],
         errors: [new Error('Commit message is not in the correct format, see\n'+
@@ -125,6 +131,21 @@ var cases = [
         in: ['Commit with\ttab'],
         errors: [new Error('First line (summary) contains invalid characters',
         Error.ERROR, [1, 12])]
+    },
+    {
+        describe: 'misplaced issue reference (in title)',
+        in: ['Commit fixes #12'],
+        errors: [new Error('First line (summary) contains invalid characters',
+        Error.ERROR, [1, 14])]
+    },
+    {
+        describe: 'misplaced issue reference (in body)',
+        in: ['Commit with issue ref',
+        'Fixes github/github#12' +
+        '\n\n' +
+        'This body contains a misplaced issue ref.'],
+        errors: [new Error('Issue references should be placed in the last paragraph of the body',
+        Error.WARNING, [3, 7])]
     },
     {
         describe: 'no imperative present tense',
