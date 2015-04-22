@@ -8,7 +8,9 @@
     "hook-uninstall": "node lib/setup uninstall",
     "postinstall": "npm run hook",
     "preuninstall": "npm run hook-uninstall",
-    "test": "mocha --reporter spec --slow 5 --check-leaks"
+    "test": "mocha --reporter spec --slow 5 --check-leaks",
+    "test-external": "mocha --reporter spec --check-leaks ./test/external/*.js",
+    "test-all": "mocha --reporter spec --check-leaks ./test/*.js ./test/*/*.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +33,7 @@
   },
   "homepage": "https://github.com/clns/node-commit-msg",
   "devDependencies": {
+    "clone": "^1.0.2",
     "mocha": "^2.2.4"
   },
   "dependencies": {
