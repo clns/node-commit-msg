@@ -64,6 +64,11 @@ var cases = [
         errors: []
     },
     {
+        describe: 'no imperative tense',
+        in: ['Add \'allow\' to non-imperative checks'],
+        errors: []
+    },
+    {
         describe: 'empty commit',
         in: [''],
         errors: [new Error('Commit message is not in the correct format, see\n'+
