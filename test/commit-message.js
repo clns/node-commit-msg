@@ -141,17 +141,17 @@ var cases = [
     {
         describe: 'misplaced issue reference (in title)',
         in: ['Commit fixes #12'],
-        errors: [new Error('First line (summary) contains invalid characters',
-        Error.ERROR, [1, 14])]
+        errors: [new Error('Issue references should be placed in the last paragraph of the body',
+        Error.WARNING, [1, 8])]
     },
     {
         describe: 'misplaced issue reference (in body)',
         in: ['Commit with issue ref',
-        'Fixes github/github#12' +
+        'Explanation: fixes github-user/repo_1.git#12' +
         '\n\n' +
         'This body contains a misplaced issue ref.'],
         errors: [new Error('Issue references should be placed in the last paragraph of the body',
-        Error.WARNING, [3, 7])]
+        Error.WARNING, [3, 14])]
     },
     {
         describe: 'non-imperative tense',
