@@ -39,10 +39,11 @@ Further paragraphs come after blank lines.
 - Typically a hyphen or asterisk is used for the bullet, followed by a
   single space, with blank lines in between, but conventions vary here
 
-- Use a hanging indent
+If you use an issue tracker, put references to them at the bottom,
+like this:
 
-Fixes #5678 (commit will be linked to the issue, which will be marked
-as resolved when pushing the commit).
+Fixes #5678, fixes #459 (see details at
+https://help.github.com/articles/closing-issues-via-commit-messages/).
 ```
 
 **DO**
