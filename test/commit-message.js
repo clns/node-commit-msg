@@ -56,6 +56,14 @@ var cases = [
         errors: []
     },
     {
+        describe: 'commit with comments',
+        in: ['Amend commit',
+        '# Please enter the commit message for your changes. Lines starting\n' +
+        '# with \'#\' will be ignored, and an empty message aborts the commit.\n' +
+        '# On branch master'],
+        errors: []
+    },
+    {
         describe: 'empty commit',
         in: [''],
         errors: [new Error('Commit message is not in the correct format, see\n'+
