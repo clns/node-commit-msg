@@ -5,7 +5,7 @@ written in Node.js. It validates a given string based on
 [best practices](CONTRIBUTING.md#commit-message) and can be used as a git hook
 and/or directly through the API.
 
-The default validations are:
+### Default validations
 
 - Title and body should be separated by an empty line, if body exists
 (*error* | *configurable*)
@@ -99,8 +99,9 @@ You can also run the validator against external repositories from GitHub
 that are known for using good commit messages. Note that these requests
 will count against your GitHub
 [Rate Limiting](https://developer.github.com/v3/#rate-limiting) policy.  
-For example, the following command will run against the first few commits
-from repositories like `git/git` and `torvalds/linux`:
+For example, the following command will run against the last commits
+from repositories like [git/git](https://github.com/git/git/commits/master)
+and [torvalds/linux](https://github.com/torvalds/linux/commits/master):
 
 ```sh
 $ npm test-external
