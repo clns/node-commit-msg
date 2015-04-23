@@ -171,7 +171,11 @@ var cases = [
 var nonImperativeCases = [
     'Changing profile picture',
     'Implemented new feature',
-    'Merged branch'
+    'Implementing new feature',
+    'Implements new feature',
+    'Merged changes into master branch',
+    'Sending the old record to the gateway',
+    'Included new library'
 ];
 
 describe('CommitMessage', function() {
@@ -210,10 +214,9 @@ describe('CommitMessage', function() {
             '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
             'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.WARNING, [1, 1]);
 
-            nonImperativeCases.forEach(function(input) {
-                var message = CommitMessage.parse(input);
-
-                it('should have 1 error', function() {
+            it('should have 1 error', function() {
+                nonImperativeCases.forEach(function(input) {
+                    var message = CommitMessage.parse(input);
                     assert.deepEqual(message._errors, [err], 'Message was:\n' + input);
                 });
             });
