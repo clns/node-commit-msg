@@ -174,6 +174,7 @@ var nonImperativeCases = [
     'Implementing new feature',
     'Implements new feature',
     'Merged changes into master branch',
+    // 'Manually merged changes into master',  // this will fail currently
     'Sending the old record to the gateway',
     'Included new library'
 ];
