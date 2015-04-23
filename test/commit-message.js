@@ -165,14 +165,13 @@ var cases = [
         'This body contains a misplaced issue ref.'],
         errors: [new Error('Issue references should be placed in the last paragraph of the body',
         Error.WARNING, [3, 14])]
-    },
-    {
-        describe: 'non-imperative tense',
-        in: ['Changes profile picture delete feature'],
-        errors: [new Error('Use imperative present tense, eg. "Fix bug" not ' +
-        '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
-        'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.WARNING, [1, 1])]
     }
+];
+
+var nonImperativeCases = [
+    'Changing profile picture',
+    'Implemented new feature',
+    'Merged branch'
 ];
 
 describe('CommitMessage', function() {
@@ -204,7 +203,21 @@ describe('CommitMessage', function() {
                 }
 
             });
-        }); // end forEach
+        }); // end cases.forEach
+
+        describe('non-imperative verbs', function() {
+            var err = new Error('Use imperative present tense, eg. "Fix bug" not ' +
+            '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
+            'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.WARNING, [1, 1]);
+
+            nonImperativeCases.forEach(function(input) {
+                var message = CommitMessage.parse(input);
+
+                it('should have 1 error', function() {
+                    assert.deepEqual(message._errors, [err], 'Message was:\n' + input);
+                });
+            });
+        }); // end non-imporative verbs
 
     }); // end #parse()
 
