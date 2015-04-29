@@ -104,11 +104,11 @@ from repositories like [git/git](https://github.com/git/git/commits/master)
 and [torvalds/linux](https://github.com/torvalds/linux/commits/master):
 
 ```sh
-$ npm test-external
+$ npm run test-external
 ```
 
 To run all tests use:
 
 ```sh
-$ npm test-all
+$ npm run test-all
 ```
