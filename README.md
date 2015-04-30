@@ -18,8 +18,8 @@ and/or directly through the API.
 (*error* | *configurable*)
 - Basic detection of non-imperative verbs, eg. "Fix bug" not "Fixes bug" or
 "Fixed bug" (*warning* | *configurable*)
-- GitHub issue references should be placed in the
-last paragraph of the body (*warning* | *configurable*)
+- [GitHub issue references](https://help.github.com/articles/closing-issues-via-commit-messages/)
+should be placed in the last paragraph of the body (*warning* | *configurable*)
 - Body should start with first letter capitalized (*error* | *configurable*)
 - Body lines should be wrapped at 72 characters (*warning* | *configurable*)
 
