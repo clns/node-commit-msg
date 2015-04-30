@@ -21,3 +21,7 @@ CONTRIBUTING.md export-ignore
 *.jpeg   binary
 *.gif    binary
 *.ico    binary
+
+# Turn off delta for binary files
+# http://blogs.atlassian.com/2014/05/handle-big-repositories-git/
+*.gz     binary -delta
