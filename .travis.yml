@@ -1,5 +1,18 @@
-language: node_js
-node_js:
-  - "0.12"
+# We must use language: java instead of node_js. Reasons are explained here:
+# https://github.com/travis-ci/travis-ci/issues/3827
+
+language: java
+
 jdk:
   - oraclejdk8
+
+env:
+  - NODE_VERSION=0.12
+
+install:
+  - nvm install $NODE_VERSION
+  - npm install
+
+script:
+  - nvm use $NODE_VERSION
+  - npm test
