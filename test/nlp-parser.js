@@ -127,6 +127,8 @@ describe('nlp-parser', function() {
     });
 
     it('should parse sentences correctly', function() {
+        this.timeout(5000); // allow enough time
+
         var sentences = [
            'Add empty name check and changed email validation.',
            'This patch will Add empty name check and changed email validation.',
