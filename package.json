@@ -9,6 +9,7 @@
     "postinstall": "npm run hook",
     "preuninstall": "npm run hook-uninstall",
     "test": "mocha --reporter spec --slow 5 --check-leaks",
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "test-external": "mocha --reporter spec --check-leaks ./test/external/*.js",
     "test-experimental": "mocha --reporter spec --check-leaks ./test/experimental/*.js --globals i --globals inflect --globals indefinite_article --globals adj_to_noun --globals to_adjective --globals to_number",
     "test-all": "mocha --reporter spec --check-leaks ./test/*.js ./test/*/*.js"
@@ -35,6 +36,8 @@
   "homepage": "https://github.com/clns/node-commit-msg",
   "devDependencies": {
     "clone": "^1.0.2",
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.13",
     "mocha": "^2.2.4"
   },
   "dependencies": {
