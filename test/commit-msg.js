@@ -12,6 +12,7 @@ var invalidFile = path.relative(root,
     path.resolve(__dirname, 'resources/COMMIT_EDITMSG-invalid'));
 
 describe('commig-msg', function() {
+    this.timeout(5000); // allow enough time
 
     describe('valid', function() {
         it('should exit with status 0', function() {
