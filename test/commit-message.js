@@ -217,7 +217,7 @@ describe('CommitMessage', function() {
 
         describe('non-imperative verbs', function() {
             it('should have 1 error', function() {
-                this.timeout(10000); // allow enough time
+                this.timeout(20000); // allow enough time
 
                 nonImperativeCases.forEach(function(input) {
                     var err = new Error('Use imperative present tense, eg. "Fix bug" not ' +
