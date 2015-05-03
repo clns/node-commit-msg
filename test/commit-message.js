@@ -92,13 +92,13 @@ var cases = [
     },
     {
         describe: 'exceeding title length soft limit',
-        in: ['Commit that exceeds the title length soft limit imposed by the config'],
+        in: ['Add commit that exceeds the soft limit title imposed by the config'],
         errors: [new Error(util.format('First line (summary) should not exceed %d characters',
         cfg.titlePreferredMaxLineLength[0]), Error.WARNING, [1, cfg.titlePreferredMaxLineLength[0]])]
     },
     {
         describe: 'exceeding title length hard limit',
-        in: ['Commit that exceeds the title length hard limit imposed by the configuration'],
+        in: ['Add commit that exceeds the title length hard limit imposed by the configuration'],
         errors: [new Error(util.format('First line (summary) should not exceed %d characters',
         cfg.titleMaxLineLength[0]), Error.ERROR, [1, cfg.titleMaxLineLength[0]])]
     },
@@ -110,15 +110,15 @@ var cases = [
     },
     {
         describe: 'ending with a period',
-        in: ['Commit message ending with a period.'],
+        in: ['Add commit message ending with a period.'],
         errors: [new Error('First line (summary) should not end with a period or whitespace',
-        Error.ERROR, [1, 36])]
+        Error.ERROR, [1, 40])]
     },
     {
         describe: 'ending with whitespace',
-        in: ['Commit message ending with a period '],
+        in: ['Add commit message ending with a whitespace '],
         errors: [new Error('First line (summary) should not end with a period or whitespace',
-        Error.ERROR, [1, 36])]
+        Error.ERROR, [1, 44])]
     },
     {
         describe: 'invalid characters',
@@ -169,15 +169,15 @@ var cases = [
 ];
 
 var nonImperativeCases = [
-    'Changing profile picture',
-    'Implemented new feature',
-    'Implementing new feature',
-    'Implements new feature',
-    'Merged changes into master branch',
-    // 'Manually merged changes into master',  // this will fail currently
-    'Sending the old record to the gateway',
-    'Included new library',
-    'Disabled password validation'
+    {msg: 'Changing profile picture', location: [1, 1]},
+    {msg: 'Implemented new feature', location: [1, 1]},
+    {msg: 'Implementing new feature', location: [1, 1]},
+    {msg: 'Implements new feature', location: [1, 1]},
+    {msg: 'Merged changes into master branch', location: [1, 1]},
+    {msg: 'Manually merged changes into master', location: [1, 10]},  // this will fail currently
+    {msg: 'Sending the old record to the gateway', location: [1, 1]},
+    {msg: 'Included new library', location: [1, 1]}
+    // {msg: 'Disabled password validation', location: [1, 1]}
 ];
 
 describe('CommitMessage', function() {
@@ -212,14 +212,16 @@ describe('CommitMessage', function() {
         }); // end cases.forEach
 
         describe('non-imperative verbs', function() {
-            var err = new Error('Use imperative present tense, eg. "Fix bug" not ' +
-            '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
-            'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.WARNING, [1, 1]);
-
             it('should have 1 error', function() {
+                this.timeout(10000); // allow enough time
+
                 nonImperativeCases.forEach(function(input) {
-                    var message = CommitMessage.parse(input);
-                    assert.deepEqual(message._errors, [err], 'Message was:\n' + input);
+                    var err = new Error('Use imperative present tense, eg. "Fix bug" not ' +
+                    '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
+                    'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, input.location);
+                    var message = CommitMessage.parse(input.msg);
+
+                    assert.deepEqual(message._errors, [err], 'Message was:\n' + input.msg);
                 });
             });
         }); // end non-imporative verbs
