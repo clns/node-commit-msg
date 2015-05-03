@@ -22,99 +22,36 @@ describe('nlp-parser', function() {
         '        (NP (NN email) (NN validation))))',
         '    (. .)))'
         ];
-    var pennParsed = {
-        parent: 'ROOT',
-        children: [
-            {
-                parent: 'S',
-                children: [
-                    {
-                        parent: 'NP',
-                        children: [
-                            {
-                                parent: 'DT This',
-                                children: []
-                            },
-                            {
-                                parent: 'NN patch',
-                                children: []
-                            }
-                        ]
-                    },
-                    {
-                        parent: 'VP',
-                        children: [
-                            {
-                                parent: 'VP',
-                                children: [
-                                    {
-                                        parent: 'MD will',
-                                        children: []
-                                    },
-                                    {
-                                        parent: 'VP',
-                                        children: [
-                                            {
-                                                parent: 'VB Add',
-                                                children: []
-                                            },
-                                            {
-                                                parent: 'NP',
-                                                children: [
-                                                    {
-                                                        parent: 'JJ empty',
-                                                        children: []
-                                                    },
-                                                    {
-                                                        parent: 'NN name',
-                                                        children: []
-                                                    },
-                                                    {
-                                                        parent: 'NN check',
-                                                        children: []
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                parent: 'CC and',
-                                children: []
-                            },
-                            {
-                                parent: 'VP',
-                                children: [
-                                    {
-                                        parent: 'VBD changed',
-                                        children: []
-                                    },
-                                    {
-                                        parent: 'NP',
-                                        children: [
-                                            {
-                                                parent: 'NN email',
-                                                children: []
-                                            },
-                                            {
-                                                parent: 'NN validation',
-                                                children: []
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        parent: '. .',
-                        children: []
-                    }
-                ]
-            }
-        ]
-    };
+    var pennParsed = Parser.newPennNode('ROOT', [
+        Parser.newPennNode('S', [
+            Parser.newPennNode('NP', [
+                Parser.newPennNode('DT This', []),
+                Parser.newPennNode('NN patch', [])
+            ]),
+            Parser.newPennNode('VP', [
+                Parser.newPennNode('VP', [
+                    Parser.newPennNode('MD will', []),
+                    Parser.newPennNode('VP', [
+                        Parser.newPennNode('VB Add', []),
+                        Parser.newPennNode('NP', [
+                            Parser.newPennNode('JJ empty', []),
+                            Parser.newPennNode('NN name', []),
+                            Parser.newPennNode('NN check', [])
+                        ])
+                    ])
+                ]),
+                Parser.newPennNode('CC and', []),
+                Parser.newPennNode('VP', [
+                    Parser.newPennNode('VBD changed', []),
+                    Parser.newPennNode('NP', [
+                        Parser.newPennNode('NN email', []),
+                        Parser.newPennNode('NN validation', [])
+                    ])
+                ])
+            ]),
+            Parser.newPennNode('. .', [])
+        ])
+    ]);
 
     it('should parse penn correctly', function() {
         var instance = new Parser();
@@ -124,6 +61,18 @@ describe('nlp-parser', function() {
         var instance2 = new Parser();
         instance2.penn = pennArr.join('\r\n');
         assert.deepEqual(instance2._penn, pennParsed);
+    });
+
+    it('should correctly use PennNode', function() {
+        var instance = new Parser();
+        instance.penn = pennArr.join('\n');
+        var root = instance.penn;
+
+        var got = root.getChildrenWithValue(/^S/)[0]
+        .getChildrenWithValue(/^VP/)[0]
+        .getChildrenWithValue(/^VP/)[1];
+        var want = pennParsed.children[0].children[1].children[2];
+        assert.deepEqual(got, want);
     });
 
     it('should parse sentences correctly', function() {
