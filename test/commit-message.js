@@ -58,6 +58,8 @@ var cases = [
     {
         describe: 'commit with comments',
         in: ['Amend commit',
+        '- Fix something\n' +
+        '- Change validation\n\n' +
         '# Please enter the commit message for your changes. Lines starting\n' +
         '# with \'#\' will be ignored, and an empty message aborts the commit.\n' +
         '# On branch master'],
@@ -127,12 +129,14 @@ var cases = [
         Error.ERROR, [1, 21])]
     },
     {
-        describe: 'long body lines',
+        describe: 'long body lines and lowercase first letter',
         in: ['Correct first line',
-'Commit body with very long lines that exceed the 72 characters limit imposed\n' +
+'commit body with very long lines that exceed the 72 characters limit imposed\n' +
 'by git commit message best practices. These practices include the linux kernel\n' +
 'and the git source.'],
-        errors: [new Error(util.format('Lines 1, 2 in the commit body are ' +
+        errors: [new Error('Body should start with a capitalized letter',
+        Error.ERROR, [3, 1]),
+            new Error(util.format('Lines 1, 2 in the commit body are ' +
         'longer than %d characters. Body lines should ' +
         'not exceed %d characters, except for compiler error ' +
         'messages or other "non-prose" explanation',
