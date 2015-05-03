@@ -3,6 +3,7 @@
 var assert = require('assert');
 var util = require('util');
 var Parser = require('../lib/nlp-parser');
+var CommitMessage = require('..');
 
 describe('nlp-parser', function() {
 
@@ -56,23 +57,30 @@ describe('nlp-parser', function() {
     it('should parse penn correctly', function() {
         var instance = new Parser();
         instance.penn = pennArr.join('\n');
-        assert.deepEqual(instance._penn, pennParsed);
-
         var instance2 = new Parser();
         instance2.penn = pennArr.join('\r\n');
-        assert.deepEqual(instance2._penn, pennParsed);
+
+        assert.deepEqual(removeCircularRefs(instance._penn), removeCircularRefs(pennParsed));
+        assert.deepEqual(removeCircularRefs(instance2._penn), removeCircularRefs(pennParsed));
     });
 
     it('should correctly use PennNode', function() {
         var instance = new Parser();
         instance.penn = pennArr.join('\n');
         var root = instance.penn;
-
         var got = root.getChildrenWithValue(/^S/)[0]
         .getChildrenWithValue(/^VP/)[0]
         .getChildrenWithValue(/^VP/)[1];
         var want = pennParsed.children[0].children[1].children[2];
-        assert.deepEqual(got, want);
+
+        assert.deepEqual(removeCircularRefs(got), removeCircularRefs(want));
+
+        got = root.getChildrenWithValue(/^S/)[0]
+        .getChildrenWithValue(/^VP/)[0]
+        .getHighestLevelNodesWithValue(/^VB/)[0];
+        want = want.children[0];
+
+        assert.deepEqual(removeCircularRefs(got), removeCircularRefs(want));
     });
 
     it('should parse sentences correctly', function() {
@@ -88,8 +96,9 @@ describe('nlp-parser', function() {
            'Bug fixes when building target.'
         ];
         var instances = Parser.parseSentencesSync(sentences);
+
         assert.equal(instances[1]._wordsAndTags, wordsAndTags);
-        assert.deepEqual(instances[1]._penn, pennParsed);
+        assert.deepEqual(removeCircularRefs(instances[1]._penn), removeCircularRefs(pennParsed));
         assert(!instances[2].hasVerb(), 'Sentence "' + sentences[2] +
         '" has hasVerb===true while should be false');
         assert(instances[0].hasVerb(), 'Sentence "' + sentences[0] +
@@ -97,3 +106,15 @@ describe('nlp-parser', function() {
     });
 
 }); // describe nlp-parser
+
+function removeCircularRefs(obj) {
+    var circularRefs = ['parent'];
+    for (var i in obj) {
+        if (circularRefs.indexOf(i) !== -1) {
+            delete obj[i];
+        }
+        if (obj.hasOwnProperty(i) && typeof(obj[i]) == 'object') {
+            removeCircularRefs(obj[i]);
+        }
+    }
+}
