@@ -20,11 +20,11 @@ program
   'and outputs all valid commmits to stdout and invalid ones to stderr.\n\n' +
   '  Examples:\n\t ./bin/validate clns/node-commit-msg\n' +
   '\t ./bin/validate git/git -v\n' +
-  '\t ./bin/validate torvalds/linux -v -l 120\n\n' +
+  '\t ./bin/validate torvalds/linux -v -l 120\n' +
   '\t ./bin/validate tpope/vim-pathogen -v -t \'<https://github.com/settings/tokens>\'')
   .option('-t, --token [s]', 'GitHub token; if not specified it will fetch anonymously')
-  .option('-l, --limit [n]', 'how many commits to process, default is 30', parseInt, 30)
-  .option('--no-colors', 'output without any colors', parseInt, 30)
+  .option('-l, --limit [n]', 'how many commits to process, default is 30', 30)
+  .option('--no-colors', 'output without any colors')
   .option('-v, --verbose', 'display warnings and errors after validation')
   .arguments('<repository>')
   .action(function (repo) {
@@ -37,6 +37,9 @@ if (!program.args.length || typeof repository === 'undefined') {
     program.help();
 }
 
+var totalCommits = 0;
+var validCommits = 0;
+var commitsWithWarn = 0;
 var processCommit = function(err, commit) {
     if (err) {
         console.error(err.toString());
@@ -48,6 +51,13 @@ var processCommit = function(err, commit) {
     } catch(e) {
         console.log('Commit was:\n' + program.noColors ? commit : chalk.cyan(commit));
         throw e;
+    }
+    totalCommits++;
+    if (!msg.hasErrors()) {
+        validCommits++;
+        if (msg.hasWarnings()) {
+            commitsWithWarn++;
+        }
     }
     var hasMessages = msg.hasErrors() || msg.hasWarnings();
     var log = msg.hasErrors() ? console.error : console.log;
@@ -63,6 +73,16 @@ var processCommit = function(err, commit) {
     logCommit(commit);
     if (hasMessages && program.verbose) {
         log(msg.formattedMessages);
+    }
+    log('-------------------------------------------------------------------------------');
+}
+var finish = function() {
+    if (program.verbose) {
+        console.log('Summary:');
+        console.log('- processed %d/%d (valid) commit(s)', validCommits, totalCommits);
+        console.log('- %d% success rate with %d% warnings',
+        parseInt(validCommits / totalCommits * 100),
+        parseInt(commitsWithWarn / validCommits * 100));
     }
 }
 
@@ -117,6 +137,8 @@ function GitHub(opts, cb) {
                 if (!(ct >= limit || commits.length < defaultLimit)) {
                     options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1);
                     get();
+                } else {
+                    finish();
                 }
             });
         });
