@@ -3,7 +3,6 @@
 var assert = require('assert');
 var util = require('util');
 var Parser = require('../lib/nlp-parser');
-var CommitMessage = require('..');
 
 describe('nlp-parser', function() {
 
