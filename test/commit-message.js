@@ -46,7 +46,7 @@ var cases = [
     },
     {
         describe: 'type: component: Prefix',
-        in: ['fix: i18n: Change login button text for spanish language'],
+        in: ['fix: i18n.po(2): Change login button text for spanish language'],
         errors: []
     },
     {
@@ -169,7 +169,22 @@ var cases = [
         'This body contains a misplaced issue ref.'],
         errors: [new Error('Issue references should be placed in the last paragraph of the body',
         Error.WARNING, [3, 14])]
+    },
+    {
+        describe: 'invalid type in commit title with past tense',
+        in: ['l10n: Updated Bulgarian translation of git (230t,0f,0u)'],
+        errors: [new Error('Invalid type l10n:', Error.ERROR, [1, 1]),
+        new Error('Use imperative present tense, eg. "Fix bug" not ' +
+        '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
+        'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, [1, 7])]
     }
+];
+
+var imperativeCases = [
+    // This was throwing exception because it doesn't parse as a sentence S.
+    // It's also not detected correctly as past tense because of
+    // the <type>: prefix which confuses the parser
+    {msg: 'L10n1#: Updated Bulgarian translation'}
 ];
 
 var nonImperativeCases = [
@@ -178,7 +193,7 @@ var nonImperativeCases = [
     {msg: 'Implementing new feature', location: [1, 1]},
     {msg: 'Implements new feature', location: [1, 1]},
     {msg: 'Merged changes into master branch', location: [1, 1]},
-    {msg: 'Manually merged changes into master', location: [1, 10]},  // this will fail currently
+    {msg: 'Manually merged changes into master', location: [1, 10]},
     {msg: 'Sending the old record to the gateway', location: [1, 1]},
     {msg: 'Included new library', location: [1, 1]}
     // {msg: 'Disabled password validation', location: [1, 1]}
@@ -215,22 +230,30 @@ describe('CommitMessage', function() {
             });
         }); // end cases.forEach
 
-        describe('non-imperative verbs', function() {
-            it('should have 1 error', function() {
-                this.timeout(20000); // allow enough time
-
-                nonImperativeCases.forEach(function(input) {
-                    var err = new Error('Use imperative present tense, eg. "Fix bug" not ' +
-                    '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
-                    'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, input.location);
-                    var message = CommitMessage.parse(input.msg);
-
-                    assert.deepEqual(message._errors, [err], 'Message was:\n' + input.msg);
-                });
-            });
-        }); // end non-imporative verbs
-
     }); // end #parse()
+
+    describe('[non]imperative verbs', function() {
+        this.timeout(20000); // allow enough time
+
+        it('should have no errors', function() {
+            imperativeCases.forEach(function(input) {
+                var message = CommitMessage.parse(input.msg);
+
+                assert.deepEqual(message._errors, [], 'Message was:\n' + input.msg);
+            });
+        });
+
+        it('should have error', function() {
+            nonImperativeCases.forEach(function(input) {
+                var err = new Error('Use imperative present tense, eg. "Fix bug" not ' +
+                '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
+                'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, input.location);
+                var message = CommitMessage.parse(input.msg);
+
+                assert.deepEqual(message._errors, [err], 'Message was:\n' + input.msg);
+            });
+        });
+    }); // end non-imporative verbs
 
     describe('#parseFromFile', function() {
         describe('valid file', function() {
