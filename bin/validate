@@ -16,8 +16,8 @@ var CommitMessage = require('..');
 
 program
   .usage('[options] <repository>')
-  .description('Process a GitHub repo\'s commits against the validator\n' +
-  'and outputs all valid commmits to stdout and invalid ones to stderr.\n\n' +
+  .description('Process a GitHub repo\'s commits against the validator and\n' +
+  'output all valid commmits to stdout and invalid ones to stderr.\n\n' +
   '  Examples:\n\n\t ./bin/validate clns/node-commit-msg\n' +
   '\t ./bin/validate git/git -v\n' +
   '\t ./bin/validate torvalds/linux -v -l 120\n' +
