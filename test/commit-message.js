@@ -66,8 +66,8 @@ var cases = [
         errors: []
     },
     {
-        describe: 'no imperative tense',
-        in: ['Add \'allow\' to non-imperative checks'],
+        describe: 'no main verb present',
+        in: ['Small changes'],
         errors: []
     },
     {
