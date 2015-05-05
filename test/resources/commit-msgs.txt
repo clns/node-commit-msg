@@ -16,3 +16,18 @@ Small changes.
 I Small changes.
 More tests.
 I More tests.
+Hopefully the last batch for 2.4.
+I Hopefully the last batch for 2.4.
+l10n: Updated Bulgarian translation of git (2305t,0f,0u).
+I l10n: Updated Bulgarian translation of git (2305t,0f,0u).
+l10n: Update Bulgarian translation of git (2305t,0f,0u).
+I l10n: Update Bulgarian translation of git (2305t,0f,0u).
+set version 0.20.
+I set version 0.20.
+Typo fix.
+I Typo fix.
+I Fix typo.
+Fix hardcoded shellslashes for helptags().
+I Fix hardcoded shellslashes for helptags().
+Strip trailing slashes is pathogen#surround().
+I Strip trailing slashes is pathogen#surround().
