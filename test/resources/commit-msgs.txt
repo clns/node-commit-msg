@@ -12,3 +12,7 @@ Manually merged changes into master.
 I Manually merged changes into master.
 Disabled password validation.
 I Disabled password validation.
+Small changes.
+I Small changes.
+More tests.
+I More tests.
