@@ -1,0 +1,126 @@
+#!/usr/bin/env node
+
+// Executable script that processes a given GitHub repo's commits
+// against the validator and outputs all valid commmits to stdout
+// and invalid ones to stderr.
+//
+// Help:
+//
+//     $ ./bin/validate -h
+
+var program = require('commander');
+var https = require('https');
+var util = require('util');
+var chalk = require('chalk');
+var CommitMessage = require('..');
+
+program
+  .usage('[options] <repository>')
+  .description('Process a GitHub repo\'s commits against the validator\n' +
+  'and outputs all valid commmits to stdout and invalid ones to stderr.\n\n' +
+  '  Examples:\n\t ./bin/validate clns/node-commit-msg\n' +
+  '\t ./bin/validate git/git -v\n' +
+  '\t ./bin/validate torvalds/linux -v -l 120\n\n' +
+  '\t ./bin/validate tpope/vim-pathogen -v -t \'<https://github.com/settings/tokens>\'')
+  .option('-t, --token [s]', 'GitHub token; if not specified it will fetch anonymously')
+  .option('-l, --limit [n]', 'how many commits to process, default is 30', parseInt, 30)
+  .option('--no-colors', 'output without any colors', parseInt, 30)
+  .option('-v, --verbose', 'display warnings and errors after validation')
+  .arguments('<repository>')
+  .action(function (repo) {
+     repository = repo;
+  });
+
+program.parse(process.argv);
+
+if (!program.args.length || typeof repository === 'undefined') {
+    program.help();
+}
+
+var processCommit = function(err, commit) {
+    if (err) {
+        console.error(err.toString());
+        process.exit(1);
+    }
+
+    try {
+        var msg = CommitMessage.parse(commit);
+    } catch(e) {
+        console.log('Commit was:\n' + program.noColors ? commit : chalk.cyan(commit));
+        throw e;
+    }
+    var hasMessages = msg.hasErrors() || msg.hasWarnings();
+    var log = msg.hasErrors() ? console.error : console.log;
+    var logError = function(s) {
+        log(program.verbose || program.noColors ? s : chalk.red(s));
+    };
+    var logValid = function(s) {
+        log(program.noColors ? s : chalk.green(s));
+    };
+    var logCommit = msg.hasErrors() ? logError : logValid;
+
+    log('-------------------------------------------------------------------------------');
+    logCommit(commit);
+    if (hasMessages && program.verbose) {
+        log(msg.formattedMessages);
+    }
+}
+
+GitHub(
+    { repo: repository, limit: program.limit, token: program.token },
+    processCommit
+);
+
+// GitHub client
+
+function GitHub(opts, cb) {
+    var path = util.format('/repos/%s/commits', opts.repo);
+    var options = {
+        hostname: 'api.github.com',
+        path: path + '?page=1',
+        headers: {
+            'User-Agent': 'clns/node-commit-msg',
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    };
+    if (opts.token) {
+        options.headers.Authorization = 'token ' + opts.token;
+    }
+    var limit = opts.limit;
+    var defaultLimit = 30;
+    var ct = 0;
+    var get = function() {
+        https.get(options, function(res) {
+            if (res.headers && res.headers['x-ratelimit-remaining'] && program.verbose) {
+                console.log('X-Ratelimit-Remaining: %d / %d',
+                res.headers['x-ratelimit-remaining'],
+                res.headers['x-ratelimit-limit']);
+            }
+            if (res.statusCode !== 200) {
+                cb(new Error(res.statusMessage));
+                return;
+            }
+
+            var body = '';
+            res.on('data', function(chunk) {
+                body += chunk.toString();
+            });
+
+            res.on('end', function () {
+                var commits = JSON.parse(body);
+
+                commits.every(function(record) {
+                    cb(null, record.commit.message);
+                    return ++ct < limit;
+                });
+
+                if (!(ct >= limit || commits.length < defaultLimit)) {
+                    options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1);
+                    get();
+                }
+            });
+        });
+    }
+
+    get();
+}
