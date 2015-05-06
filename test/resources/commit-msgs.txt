@@ -31,3 +31,5 @@ Fix hardcoded shellslashes for helptags().
 I Fix hardcoded shellslashes for helptags().
 Strip trailing slashes is pathogen#surround().
 I Strip trailing slashes is pathogen#surround().
+Add install atom script for OS X.
+I Add install atom script for OS X.
