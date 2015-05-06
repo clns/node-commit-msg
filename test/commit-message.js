@@ -181,10 +181,15 @@ var cases = [
 ];
 
 var imperativeCases = [
-    // This was throwing exception because it doesn't parse as a sentence S.
+    // This was throwing an exception because it doesn't parse as a sentence S.
     // It's also not detected correctly as past tense because of
     // the <type>: prefix which confuses the parser
-    {msg: 'L10n1#: Updated Bulgarian translation'}
+    {msg: 'L10n1#: Updated Bulgarian translation'},
+    // This was throwing an exception because the two sentences
+    // 'Add install atom script for OS X.' and 'I Add install atom script for OS X.'
+    // are treated as one sentece because of the 'OS X.' termination ('X.' is
+    // considered a word instead of only 'X' without the dot)
+    {msg: 'Add install atom script for OS X'}
 ];
 
 var nonImperativeCases = [
