@@ -49,7 +49,7 @@ var processCommit = function(err, commit) {
     try {
         var msg = CommitMessage.parse(commit);
     } catch(e) {
-        console.log('Commit was:\n' + program.noColors ? commit : chalk.cyan(commit));
+        console.log('Commit was:', program.noColors ? commit : chalk.cyan(commit));
         throw e;
     }
     totalCommits++;
