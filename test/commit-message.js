@@ -189,7 +189,9 @@ var imperativeCases = [
     // 'Add install atom script for OS X.' and 'I Add install atom script for OS X.'
     // are treated as one sentece because of the 'OS X.' termination ('X.' is
     // considered a word instead of only 'X' without the dot)
-    {msg: 'Add install atom script for OS X'}
+    {msg: 'Add install atom script for OS X'},
+    // Thinks it's not in imperative mood
+    {msg: 'Don\'t create delta for .bz2 files'}
 ];
 
 var nonImperativeCases = [
