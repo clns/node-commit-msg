@@ -21,5 +21,8 @@ indent_size = 2
 max_line_length = 0
 trim_trailing_whitespace = false
 
+[Makefile]
+indent_style = tab
+
 [COMMIT_EDITMSG]
 max_line_length = 72
