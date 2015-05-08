@@ -29,7 +29,7 @@ describe('commig-msg', function() {
     });
 
     describe('invalid', function() {
-        it('should exit with error status 9', function() {
+        it('should exit with error status 1', function() {
             assert.throws(
                 function() {
                     execFileSync('node', [hook, invalidFile], {
@@ -39,7 +39,7 @@ describe('commig-msg', function() {
                     });
                 },
                 function(e) {
-                    return e.status === 9;
+                    return e.status === 1;
                 }
             );
         });
