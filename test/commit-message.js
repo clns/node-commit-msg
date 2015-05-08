@@ -98,13 +98,13 @@ var cases = [
     {
         describe: 'exceeding title length soft limit',
         in: ['Add commit that exceeds the soft limit title imposed by the config'],
-        errors: [new Error(util.format('First line (subject) should not exceed %d characters',
+        errors: [new Error(util.format('Commit subject should not exceed %d characters',
         cfg.titlePreferredMaxLineLength[0]), Error.WARNING, [1, cfg.titlePreferredMaxLineLength[0]])]
     },
     {
         describe: 'exceeding title length hard limit',
         in: ['Add commit that exceeds the title length hard limit imposed by the configuration'],
-        errors: [new Error(util.format('First line (subject) should not exceed %d characters',
+        errors: [new Error(util.format('Commit subject should not exceed %d characters',
         cfg.titleMaxLineLength[0]), Error.ERROR, [1, cfg.titleMaxLineLength[0]])]
     },
     {
@@ -116,19 +116,19 @@ var cases = [
     {
         describe: 'ending with a period',
         in: ['Add commit message ending with a period.'],
-        errors: [new Error('First line (subject) should not end with a period or whitespace',
+        errors: [new Error('Commit subject should not end with a period or whitespace',
         Error.ERROR, [1, 40])]
     },
     {
         describe: 'ending with whitespace',
         in: ['Add commit message ending with a whitespace '],
-        errors: [new Error('First line (subject) should not end with a period or whitespace',
+        errors: [new Error('Commit subject should not end with a period or whitespace',
         Error.ERROR, [1, 44])]
     },
     {
         describe: 'invalid characters',
         in: ['Commit message with <invalid> chars'],
-        errors: [new Error('First line (subject) contains invalid characters',
+        errors: [new Error('Commit subject contains invalid characters',
         Error.ERROR, [1, 21])]
     },
     {
@@ -137,7 +137,7 @@ var cases = [
 'commit body with very long lines that exceed the 72 characters limit imposed\n' +
 'by git commit message best practices. These practices include the linux kernel\n' +
 'and the git source.'],
-        errors: [new Error('Body should start with a capitalized letter',
+        errors: [new Error('Commit body should start with a capitalized letter',
         Error.ERROR, [3, 1]),
             new Error(util.format('Lines 1, 2 in the commit body are ' +
         'longer than %d characters. Body lines should ' +
@@ -149,13 +149,13 @@ var cases = [
     {
         describe: 'invalid whitespace (space)',
         in: ['Commit  with 2 consecutive spaces'],
-        errors: [new Error('First line (subject) contains invalid whitespace',
+        errors: [new Error('Commit subject contains invalid whitespace',
         Error.ERROR, [1, 7])]
     },
     {
         describe: 'invalid whitespace (tab)',
         in: ['Commit with\ttab'],
-        errors: [new Error('First line (subject) contains invalid characters',
+        errors: [new Error('Commit subject contains invalid characters',
         Error.ERROR, [1, 12])]
     },
     {
@@ -176,7 +176,7 @@ var cases = [
     {
         describe: 'invalid type in commit title with past tense',
         in: ['l10n: Updated Bulgarian translation of git (230t,0f,0u)'],
-        errors: [new Error('Invalid type l10n:', Error.ERROR, [1, 1]),
+        errors: [new Error('Commit subject contains invalid type l10n:', Error.ERROR, [1, 1]),
         new Error('Use imperative present tense, eg. "Fix bug" not ' +
         '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
         'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, [1, 7])]
