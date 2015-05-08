@@ -73,35 +73,38 @@ var cases = [
     {
         describe: 'empty commit',
         in: [''],
-        errors: [new Error('Commit message is not in the correct format, see\n'+
-        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message',
+        errors: [new Error('Commit message is not in the correct format; subject (first line) ' +
+        'and body should be separated by one empty line and max one empty line ' +
+        'is allowed at the end',
         Error.ERROR)]
     },
     {
         describe: 'title starting with newline',
         in: ['\nCommit message starting with newline'],
-        errors: [new Error('Commit message is not in the correct format, see\n'+
-        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message',
+        errors: [new Error('Commit message is not in the correct format; subject (first line) ' +
+        'and body should be separated by one empty line and max one empty line ' +
+        'is allowed at the end',
         Error.ERROR)]
     },
     {
         describe: 'body starting with newline',
-        in: ['Correct summary',
+        in: ['Correct subject',
         '\nBody starting with newline'],
-        errors: [new Error('Commit message is not in the correct format, see\n'+
-        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message',
+        errors: [new Error('Commit message is not in the correct format; subject (first line) ' +
+        'and body should be separated by one empty line and max one empty line ' +
+        'is allowed at the end',
         Error.ERROR)]
     },
     {
         describe: 'exceeding title length soft limit',
         in: ['Add commit that exceeds the soft limit title imposed by the config'],
-        errors: [new Error(util.format('First line (summary) should not exceed %d characters',
+        errors: [new Error(util.format('First line (subject) should not exceed %d characters',
         cfg.titlePreferredMaxLineLength[0]), Error.WARNING, [1, cfg.titlePreferredMaxLineLength[0]])]
     },
     {
         describe: 'exceeding title length hard limit',
         in: ['Add commit that exceeds the title length hard limit imposed by the configuration'],
-        errors: [new Error(util.format('First line (summary) should not exceed %d characters',
+        errors: [new Error(util.format('First line (subject) should not exceed %d characters',
         cfg.titleMaxLineLength[0]), Error.ERROR, [1, cfg.titleMaxLineLength[0]])]
     },
     {
@@ -113,19 +116,19 @@ var cases = [
     {
         describe: 'ending with a period',
         in: ['Add commit message ending with a period.'],
-        errors: [new Error('First line (summary) should not end with a period or whitespace',
+        errors: [new Error('First line (subject) should not end with a period or whitespace',
         Error.ERROR, [1, 40])]
     },
     {
         describe: 'ending with whitespace',
         in: ['Add commit message ending with a whitespace '],
-        errors: [new Error('First line (summary) should not end with a period or whitespace',
+        errors: [new Error('First line (subject) should not end with a period or whitespace',
         Error.ERROR, [1, 44])]
     },
     {
         describe: 'invalid characters',
         in: ['Commit message with <invalid> chars'],
-        errors: [new Error('First line (summary) contains invalid characters',
+        errors: [new Error('First line (subject) contains invalid characters',
         Error.ERROR, [1, 21])]
     },
     {
@@ -146,13 +149,13 @@ var cases = [
     {
         describe: 'invalid whitespace (space)',
         in: ['Commit  with 2 consecutive spaces'],
-        errors: [new Error('First line (summary) contains invalid whitespace',
+        errors: [new Error('First line (subject) contains invalid whitespace',
         Error.ERROR, [1, 7])]
     },
     {
         describe: 'invalid whitespace (tab)',
         in: ['Commit with\ttab'],
-        errors: [new Error('First line (summary) contains invalid characters',
+        errors: [new Error('First line (subject) contains invalid characters',
         Error.ERROR, [1, 12])]
     },
     {
