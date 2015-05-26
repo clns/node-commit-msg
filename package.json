@@ -44,5 +44,8 @@
     "chalk": "^1.0.0",
     "commander": "^2.8.1",
     "semver": "^4.3.3"
+  },
+  "optionalDependencies": {
+    "java": "^0.5.4"
   }
 }
