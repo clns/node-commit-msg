@@ -8,7 +8,7 @@ describe('nlp-parser', function() {
 
     // Sentence: 'This patch will Add empty name check and changed email validation.'
     // Online parser: http://nlp.stanford.edu:8080/parser/index.jsp
-    var wordsAndTags = 'This/DT patch/NN will/MD Add/VB empty/JJ name/NN check/NN and/CC changed/VBD email/NN validation/NN ./.';
+    var wordsAndTags = 'This/DT patch/NN will/MD Add/VB empty/JJ name/NN check/NN and/CC changed/VBD email/NN validation/NN';
     var pennArr = [
         '(ROOT',
         '  (S',
@@ -19,8 +19,7 @@ describe('nlp-parser', function() {
         '          (NP (JJ empty) (NN name) (NN check))))',
         '      (CC and)',
         '      (VP (VBD changed)',
-        '        (NP (NN email) (NN validation))))',
-        '    (. .)))'
+        '        (NP (NN email) (NN validation))))))'
         ];
     var pennParsed = Parser.newPennNode('ROOT', [
         Parser.newPennNode('S', [
@@ -48,8 +47,7 @@ describe('nlp-parser', function() {
                         Parser.newPennNode('NN validation', [])
                     ])
                 ])
-            ]),
-            Parser.newPennNode('. .', [])
+            ])
         ])
     ]);
 
@@ -86,21 +84,21 @@ describe('nlp-parser', function() {
         this.timeout(5000); // allow enough time
 
         var sentences = [
-           'Add empty name check and changed email validation.',
-           'This patch will Add empty name check and changed email validation.',
-           'CSS fixes for the profile page.',
-           'This patch will CSS fixes for the profile page.',
-           'Fixed bug in landing page.',
-           'This patch will Fixed bug in landing page.',
-           'Bug fixes when building target.'
+           'Add empty name check and changed email validation',
+           'This patch will Add empty name check and changed email validation',
+           'CSS fixes for the profile page',
+           'This patch will CSS fixes for the profile page',
+           'Fixed bug in landing page',
+           'This patch will Fixed bug in landing page',
+           'Bug fixes when building target'
         ];
-        var instances = Parser.parseSentencesSync(sentences);
+        var instances = Parser.parseSentencesSync(sentences, 'newline');
 
         assert.equal(instances[1]._wordsAndTags, wordsAndTags);
         assert.deepEqual(removeCircularRefs(instances[1]._penn), removeCircularRefs(pennParsed));
-        assert(!instances[2].hasVerb(), 'Sentence "' + sentences[2] +
+        assert(!instances[2].hasVerb(), 'Sentence "' + instances[2]._wordsAndTags +
         '" has hasVerb===true while should be false');
-        assert(instances[0].hasVerb(), 'Sentence "' + sentences[0] +
+        assert(instances[0].hasVerb(), 'Sentence "' + instances[0]._wordsAndTags +
         '" has hasVerb===false while should be true');
     });
 
