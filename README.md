@@ -85,6 +85,12 @@ new Range('bytes', '0-49'); // => bytes=0-49
 
 For more usages check the [test files](test).
 
+#### Bypass validation
+
+If you know what you're doing you can skip the validation
+altogether using `git commit --no-verify`. Be aware that this
+will bypass the *pre-commit* and *commit-msg* hooks.
+
 ## API
 
 TOOD
@@ -112,3 +118,10 @@ To run all tests use:
 ```sh
 $ npm run test-all
 ```
+
+## Known issues
+
+- Doesn't work with `git commit -v`
+- Should not validate what git considers an empty commit message
+(a message that includes only comments or lines not considered
+part of the commit message)
