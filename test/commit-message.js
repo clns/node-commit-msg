@@ -7,6 +7,7 @@ var CommitMessage = require('..');
 var Error = require('../lib/error');
 
 var cfg = CommitMessage.prototype.config;
+cfg.imperativeVerbsInTitle[1] = true; // always check
 var cases = [
     {
         describe: 'simple message',
@@ -184,10 +185,6 @@ var cases = [
 ];
 
 var imperativeCases = [
-    // This was throwing an exception because it doesn't parse as a sentence S.
-    // It's also not detected correctly as past tense because of
-    // the <type>: prefix which confuses the parser
-    {msg: 'L10n1#: Updated Bulgarian translation'},
     // This was throwing an exception because the two sentences
     // 'Add install atom script for OS X.' and 'I Add install atom script for OS X.'
     // are treated as one sentece because of the 'OS X.' termination ('X.' is
@@ -205,7 +202,11 @@ var nonImperativeCases = [
     {msg: 'Merged changes into master branch', location: [1, 1]},
     {msg: 'Manually merged changes into master', location: [1, 10]},
     {msg: 'Sending the old record to the gateway', location: [1, 1]},
-    {msg: 'Included new library', location: [1, 1]}
+    {msg: 'Included new library', location: [1, 1]},
+    // This was throwing an exception because it doesn't parse as a sentence S.
+    // It's also not detected correctly as past tense because of
+    // the <type>: prefix which confuses the parser
+    {msg: 'docs: Updated Bulgarian translation', location: [1, 7]}
     // {msg: 'Disabled password validation', location: [1, 1]}
 ];
 
