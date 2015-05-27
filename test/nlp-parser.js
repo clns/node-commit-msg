@@ -91,6 +91,8 @@ describe('nlp-parser', function() {
     });
 
     it('should work without node-java', function() {
+        this.timeout(5000); // allow enough time on Travis
+
         var sentences = [
            'CSS fixes',
            'Fix home page styling'
