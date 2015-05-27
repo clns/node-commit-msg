@@ -102,6 +102,33 @@ describe('nlp-parser', function() {
         '" has hasVerb===false while should be true');
     });
 
+    it('should work without node-java', function() {
+        var sentences = [
+           'CSS fixes',
+           'Fix home page styling'
+        ];
+        var parserFn = Parser.parser;
+        Parser.parser = function() { return false; }
+        var instances = Parser.parseSentencesSync(sentences, 'newline');
+        Parser.parser = parserFn;
+
+        assert.equal(instances[0]._wordsAndTags, 'CSS/NNP fixes/NNS');
+        assert.deepEqual(removeCircularRefs(instances[1].penn), removeCircularRefs(
+            Parser.newPennNode('ROOT', [
+                Parser.newPennNode('S', [
+                    Parser.newPennNode('VP', [
+                        Parser.newPennNode('VB Fix', []),
+                        Parser.newPennNode('NP', [
+                            Parser.newPennNode('NN home', []),
+                            Parser.newPennNode('NN page', []),
+                            Parser.newPennNode('NN styling', [])
+                        ])
+                    ])
+                ])
+            ]))
+        );
+    });
+
 }); // describe nlp-parser
 
 function removeCircularRefs(obj) {
