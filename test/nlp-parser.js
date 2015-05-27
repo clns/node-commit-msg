@@ -6,37 +6,27 @@ var Parser = require('../lib/nlp-parser');
 
 describe('nlp-parser', function() {
 
-    // Sentence: 'This patch will Add empty name check and changed email validation.'
-    // Online parser: http://nlp.stanford.edu:8080/parser/index.jsp
-    var wordsAndTags = 'This/DT patch/NN will/MD Add/VB empty/JJ name/NN check/NN and/CC changed/VBD email/NN validation/NN';
+    // Sentence: 'Add empty name check and changed email validation'
+    var wordsAndTags = 'Add/VB empty/JJ name/NN check/NN and/CC changed/VBD email/NN validation/NN';
     var pennArr = [
         '(ROOT',
         '  (S',
-        '    (NP (DT This) (NN patch))',
         '    (VP',
-        '      (VP (MD will)',
-        '        (VP (VB Add)',
-        '          (NP (JJ empty) (NN name) (NN check))))',
+        '      (VP (VB Add)',
+        '        (NP (JJ empty) (NN name) (NN check)))',
         '      (CC and)',
         '      (VP (VBD changed)',
         '        (NP (NN email) (NN validation))))))'
         ];
     var pennParsed = Parser.newPennNode('ROOT', [
         Parser.newPennNode('S', [
-            Parser.newPennNode('NP', [
-                Parser.newPennNode('DT This', []),
-                Parser.newPennNode('NN patch', [])
-            ]),
             Parser.newPennNode('VP', [
                 Parser.newPennNode('VP', [
-                    Parser.newPennNode('MD will', []),
-                    Parser.newPennNode('VP', [
-                        Parser.newPennNode('VB Add', []),
-                        Parser.newPennNode('NP', [
-                            Parser.newPennNode('JJ empty', []),
-                            Parser.newPennNode('NN name', []),
-                            Parser.newPennNode('NN check', [])
-                        ])
+                    Parser.newPennNode('VB Add', []),
+                    Parser.newPennNode('NP', [
+                        Parser.newPennNode('JJ empty', []),
+                        Parser.newPennNode('NN name', []),
+                        Parser.newPennNode('NN check', [])
                     ])
                 ]),
                 Parser.newPennNode('CC and', []),
@@ -68,12 +58,13 @@ describe('nlp-parser', function() {
         var got = root.getChildrenWithValue(/^S/)[0]
         .getChildrenWithValue(/^VP/)[0]
         .getChildrenWithValue(/^VP/)[1];
-        var want = pennParsed.children[0].children[1].children[2];
+        var want = pennParsed.children[0].children[0].children[2];
 
         assert.deepEqual(removeCircularRefs(got), removeCircularRefs(want));
 
         got = root.getChildrenWithValue(/^S/)[0]
         .getChildrenWithValue(/^VP/)[0]
+        .getChildrenWithValue(/^VP/)[1]
         .getHighestLevelNodesWithValue(/^VB/)[0];
         want = want.children[0];
 
@@ -85,20 +76,17 @@ describe('nlp-parser', function() {
 
         var sentences = [
            'Add empty name check and changed email validation',
-           'This patch will Add empty name check and changed email validation',
            'CSS fixes for the profile page',
-           'This patch will CSS fixes for the profile page',
            'Fixed bug in landing page',
-           'This patch will Fixed bug in landing page',
            'Bug fixes when building target'
         ];
         var instances = Parser.parseSentencesSync(sentences, 'newline');
 
-        assert.equal(instances[1]._wordsAndTags, wordsAndTags);
-        assert.deepEqual(removeCircularRefs(instances[1]._penn), removeCircularRefs(pennParsed));
-        assert(!instances[2].hasVerb(), 'Sentence "' + instances[2]._wordsAndTags +
+        assert.equal(instances[0]._wordsAndTags, wordsAndTags);
+        assert.deepEqual(removeCircularRefs(instances[0]._penn), removeCircularRefs(pennParsed));
+        assert(!instances[1].hasVerb(), 'Sentence "' + instances[1]._wordsAndTags +
         '" has hasVerb===true while should be false');
-        assert(instances[0].hasVerb(), 'Sentence "' + instances[0]._wordsAndTags +
+        assert(instances[2].hasVerb(), 'Sentence "' + instances[2]._wordsAndTags +
         '" has hasVerb===false while should be true');
     });
 
