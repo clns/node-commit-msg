@@ -1,9 +1,9 @@
 'use strict';
 
 var assert = require('assert');
-var Issue = require('../lib/github-ref-parser').Issue;
+var Issue = require('../../lib/references/github');
 
-describe('GHIssue', function() {
+describe('references/github', function() {
 
     it('should stringify correctly', function() {
         var i = new Issue(1, 'hub', 'github');

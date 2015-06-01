@@ -4,10 +4,15 @@ var assert = require('assert');
 var util = require('util');
 var path = require('path');
 var CommitMessage = require('..');
+var Config = require('../lib/config');
 var Error = require('../lib/error');
 
-var cfg = CommitMessage.prototype.config;
-cfg.imperativeVerbsInTitle[1] = true; // always check
+var cfg = Config({
+    imperativeVerbsInTitle: {
+        alwaysCheck: true
+    }
+});
+
 var cases = [
     {
         describe: 'simple message',
@@ -58,12 +63,17 @@ var cases = [
     },
     {
         describe: 'commit with comments',
-        in: ['Amend commit',
+        raw: 'Amend commit\n\n' +
         '- Fix something\n' +
         '- Change validation\n\n' +
         '# Please enter the commit message for your changes. Lines starting\n' +
         '# with \'#\' will be ignored, and an empty message aborts the commit.\n' +
-        '# On branch master'],
+        '# On branch master\n' +
+        '# Everything below this line will be ignored.\n\n' +
+        'diff ...',
+        in: ['Amend commit',
+        '- Fix something\n' +
+        '- Change validation'],
         errors: []
     },
     {
@@ -72,41 +82,29 @@ var cases = [
         errors: []
     },
     {
-        describe: 'empty commit',
+        describe: 'empty commit message',
         in: [''],
-        errors: [new Error('Commit message is not in the correct format; subject (first line) ' +
-        'and body should be separated by one empty line and max one empty line ' +
-        'is allowed at the end',
-        Error.ERROR)]
-    },
-    {
-        describe: 'title starting with newline',
-        in: ['\nCommit message starting with newline'],
-        errors: [new Error('Commit message is not in the correct format; subject (first line) ' +
-        'and body should be separated by one empty line and max one empty line ' +
-        'is allowed at the end',
-        Error.ERROR)]
+        errors: []
     },
     {
         describe: 'body starting with newline',
         in: ['Correct subject',
         '\nBody starting with newline'],
         errors: [new Error('Commit message is not in the correct format; subject (first line) ' +
-        'and body should be separated by one empty line and max one empty line ' +
-        'is allowed at the end',
+        'and body should be separated by one empty line',
         Error.ERROR)]
     },
     {
         describe: 'exceeding title length soft limit',
         in: ['Add commit that exceeds the soft limit title imposed by the config'],
         errors: [new Error(util.format('Commit subject should not exceed %d characters',
-        cfg.titlePreferredMaxLineLength[0]), Error.WARNING, [1, cfg.titlePreferredMaxLineLength[0]])]
+        cfg.titlePreferredMaxLineLength.length), Error.WARNING, [1, cfg.titlePreferredMaxLineLength.length])]
     },
     {
         describe: 'exceeding title length hard limit',
         in: ['Add commit that exceeds the title length hard limit imposed by the configuration'],
         errors: [new Error(util.format('Commit subject should not exceed %d characters',
-        cfg.titleMaxLineLength[0]), Error.ERROR, [1, cfg.titleMaxLineLength[0]])]
+        cfg.titleMaxLineLength.length), Error.ERROR, [1, cfg.titleMaxLineLength.length])]
     },
     {
         describe: 'starting with a lowercase letter',
@@ -121,31 +119,23 @@ var cases = [
         Error.ERROR, [1, 40])]
     },
     {
-        describe: 'ending with whitespace',
-        in: ['Add commit message ending with a whitespace '],
-        errors: [new Error('Commit subject should not end with a period or whitespace',
-        Error.ERROR, [1, 44])]
-    },
-    {
         describe: 'invalid characters',
         in: ['Commit message with <invalid> chars'],
         errors: [new Error('Commit subject contains invalid characters',
         Error.ERROR, [1, 21])]
     },
     {
-        describe: 'long body lines and lowercase first letter',
+        describe: 'long body lines',
         in: ['Correct first line',
 'commit body with very long lines that exceed the 72 characters limit imposed\n' +
 'by git commit message best practices. These practices include the linux kernel\n' +
 'and the git source.'],
-        errors: [new Error('Commit body should start with a capitalized letter',
-        Error.ERROR, [3, 1]),
-            new Error(util.format('Lines 1, 2 in the commit body are ' +
+        errors: [new Error(util.format('Lines 1, 2 in the commit body are ' +
         'longer than %d characters. Body lines should ' +
         'not exceed %d characters, except for compiler error ' +
         'messages or other "non-prose" explanation',
-        cfg.bodyMaxLineLength[0], cfg.bodyMaxLineLength[0]),
-        Error.WARNING, [3, cfg.bodyMaxLineLength[0]])]
+        cfg.bodyMaxLineLength.length, cfg.bodyMaxLineLength.length),
+        Error.WARNING, [3, cfg.bodyMaxLineLength.length])]
     },
     {
         describe: 'invalid whitespace (space)',
@@ -162,8 +152,8 @@ var cases = [
     {
         describe: 'misplaced issue reference (in title)',
         in: ['Commit fixes #12'],
-        errors: [new Error('Issue references should be placed in the last paragraph of the body',
-        Error.WARNING, [1, 8])]
+        errors: [new Error('References should be placed in the last paragraph of the body',
+        Error.ERROR, [1, 8])]
     },
     {
         describe: 'misplaced issue reference (in body)',
@@ -171,8 +161,8 @@ var cases = [
         'Explanation: fixes github-user/repo_1.git#12' +
         '\n\n' +
         'This body contains a misplaced issue ref.'],
-        errors: [new Error('Issue references should be placed in the last paragraph of the body',
-        Error.WARNING, [3, 14])]
+        errors: [new Error('References should be placed in the last paragraph of the body',
+        Error.ERROR, [3, 14])]
     },
     {
         describe: 'invalid type in commit title with past tense',
@@ -216,7 +206,7 @@ describe('CommitMessage', function() {
 
         cases.forEach(function(t) {
             var input = t.raw || t.in.join('\n\n');
-            var message = CommitMessage.parse(input);
+            var message = CommitMessage.parse(input, cfg);
             var failMsg = 'Message was:\n' + input;
             var errNo = t.errors.length;
             var itFn = t.skip ? it.skip : it;

@@ -8,7 +8,7 @@
     "hook-uninstall": "node lib/setup uninstall",
     "postinstall": "npm run hook",
     "preuninstall": "npm run hook-uninstall",
-    "test": "mocha --reporter spec --slow 5 --check-leaks",
+    "test": "mocha --reporter spec --slow 5 --check-leaks test/*.js test/references/*",
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "test-external": "mocha --reporter spec --check-leaks ./test/external/*.js",
     "test-experimental": "mocha --reporter spec --check-leaks ./test/experimental/*.js --globals i --globals inflect --globals indefinite_article --globals adj_to_noun --globals to_adjective --globals to_number",
