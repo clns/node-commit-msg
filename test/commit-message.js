@@ -52,7 +52,7 @@ var cases = [
     },
     {
         describe: 'type: component: Prefix',
-        in: ['fix: i18n.po(2): Change login button text for spanish language'],
+        in: ['fix: i18n.po(2): Change login button text'],
         errors: []
     },
     {
@@ -194,11 +194,23 @@ var cases = [
     },
     {
         describe: 'invalid type in commit title with past tense',
-        in: ['l10n: Updated Bulgarian translation of git (230t,0f,0u)'],
+        in: ['l10n: Updated German translation of git (20t,0u)'],
         errors: [new Error('Commit subject contains invalid type l10n:', Error.ERROR, [1, 1]),
         new Error('Use imperative present tense, eg. "Fix bug" not ' +
         '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
         'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, [1, 7])]
+    },
+    {
+        describe: 'required type: component: Prefix',
+        in: ['Change login button text for spanish language'],
+        errors: [new Error('Commit subject should be prefixed by a type',
+            Error.ERROR, [1, 1])],
+        config: Config({
+            imperativeVerbsInTitle: {
+                alwaysCheck: true
+            },
+            types: {required: true}
+        })
     }
 ];
 
@@ -239,9 +251,10 @@ describe('CommitMessage', function() {
             var itFn = t.skip ? it.skip : it;
             var expectErrors = !t.errors.every(function(e) { return !e.is(Error.ERROR); });
             var expectWarnings = !t.errors.every(function(e) { return !e.is(Error.WARNING); });
+            var config = t.config || cfg;
 
             itFn(util.format('should parse %s', t.describe), function(done) {
-                CommitMessage.parse(input, cfg, function(err, message) {
+                CommitMessage.parse(input, config, function(err, message) {
                     if (err) return done(err);
 
                     assert.deepEqual(message._errors, t.errors, failMsg);
