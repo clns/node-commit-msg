@@ -21,10 +21,12 @@ program
   '  Examples:\n\n\t ./bin/validate clns/node-commit-msg\n' +
   '\t ./bin/validate git/git -v\n' +
   '\t ./bin/validate torvalds/linux -v -l 120\n' +
-  '\t ./bin/validate tpope/vim-pathogen -v -t \'<https://github.com/settings/tokens>\'')
+  '\t ./bin/validate tpope/vim-pathogen -v -t \'<https://github.com/settings/tokens>\'\n' +
+  '\t ./bin/validate angular/angular.js -v -c test/resources/angular')
   .option('-t, --token [s]', 'GitHub token; if not specified it will fetch anonymously')
   .option('-l, --limit [n]', 'how many commits to process, default is 30', 30)
   .option('--no-colors', 'output without any colors')
+  .option('-c, --config [s]', 'the package.json config base dir to use', true)
   .option('-v, --verbose', 'display warnings and errors after validation')
   .arguments('<repository>')
   .action(function (repo) {
@@ -46,7 +48,7 @@ var processCommit = function(err, commit, cb) {
         process.exit(1);
     }
 
-    CommitMessage.parse(commit, true, function(err, msg) {
+    CommitMessage.parse(commit, program.config, function(err, msg) {
         if (err) {
             console.log('Commit was:', program.noColors ? commit : chalk.cyan(commit));
             throw e;
@@ -56,9 +58,9 @@ var processCommit = function(err, commit, cb) {
 
         if (!msg.hasErrors()) {
             validCommits++;
-            if (msg.hasWarnings()) {
-                commitsWithWarn++;
-            }
+        }
+        if (msg.hasWarnings()) {
+            commitsWithWarn++;
         }
         var hasMessages = msg.hasErrors() || msg.hasWarnings();
         var log = msg.hasErrors() ? console.error : console.log;
@@ -84,9 +86,9 @@ var finish = function() {
     if (program.verbose) {
         console.log('Summary:');
         console.log('- processed %d/%d (valid) commit(s)', validCommits, totalCommits);
-        console.log('- %d% success rate with %d% warnings',
-        parseInt(validCommits / totalCommits * 100),
-        parseInt(commitsWithWarn / validCommits * 100));
+        console.log('- %d% success rate and %d% warnings',
+        totalCommits ? parseInt(validCommits / totalCommits * 100) : 0,
+        totalCommits ? parseInt(commitsWithWarn / totalCommits * 100) : 0);
     }
 }
 
