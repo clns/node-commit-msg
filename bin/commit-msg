@@ -7,16 +7,16 @@ var path = require('path');
 var CommitMessage = require('..');
 
 var file = process.argv[2]; // usually '.git/COMMIT_EDITMSG'
-var message = CommitMessage.parseFromFile(file, path.dirname(process.argv[0]));
-
-if (message.hasErrors() || message.hasWarnings()) {
-    console.log(message.formattedMessages);
-}
-if (message.hasErrors()) {
-    console.error('Commit failed due to invalid commit message, see',
-    'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message');
-    console.error('---');
-    console.error(message.message);
-    // https://nodejs.org/api/process.html#process_exit_codes
-    process.exit(1); // Uncaught Fatal Exception
-}
+CommitMessage.parseFromFile(file, path.dirname(process.argv[0]), function(err, message) {
+    if (message.hasErrors() || message.hasWarnings()) {
+        console.log(message.formattedMessages);
+    }
+    if (message.hasErrors()) {
+        console.error('Commit failed due to invalid commit message, see',
+        'https://github.com/clns/node-commit-msg/blob/master/CONTRIBUTING.md#commit-message');
+        console.error('---');
+        console.error(message.message);
+        // https://nodejs.org/api/process.html#process_exit_codes
+        process.exit(1); // Uncaught Fatal Exception
+    }
+});

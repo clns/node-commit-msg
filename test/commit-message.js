@@ -87,6 +87,13 @@ var cases = [
         errors: []
     },
     {
+        describe: 'empty commit message with comments',
+        raw: '\n\n#This is an empty commit message.\nEverything below ' +
+        'this line will be ignored.\n\ndiff ...',
+        in: [''],
+        errors: []
+    },
+    {
         describe: 'body starting with newline',
         in: ['Correct subject',
         '\nBody starting with newline'],
@@ -206,28 +213,24 @@ describe('CommitMessage', function() {
 
         cases.forEach(function(t) {
             var input = t.raw || t.in.join('\n\n');
-            var message = CommitMessage.parse(input, cfg);
             var failMsg = 'Message was:\n' + input;
             var errNo = t.errors.length;
             var itFn = t.skip ? it.skip : it;
             var expectErrors = !t.errors.every(function(e) { return !e.is(Error.ERROR); });
 
-            describe(t.describe, function() {
+            itFn(util.format('should parse %s', t.describe), function(done) {
+                CommitMessage.parse(input, cfg, function(err, message) {
+                    if (err) return done(err);
 
-                itFn(util.format('should have %d error(s)', errNo), function() {
                     assert.deepEqual(message._errors, t.errors, failMsg);
-                });
 
-                if (!message.hasErrors() && !expectErrors) {
-                    itFn('should have the correct title', function() {
+                    if (!message.hasErrors() && !expectErrors) {
                         assert.equal(message._title, t.in[0], failMsg);
-                    });
-
-                    itFn('should have the correct body', function() {
                         assert.equal(message._body, t.in[1], failMsg);
-                    });
-                }
+                    }
 
+                    done();
+                });
             });
         }); // end cases.forEach
 
@@ -236,41 +239,45 @@ describe('CommitMessage', function() {
     describe('[non]imperative verbs', function() {
         this.timeout(20000); // allow enough time
 
-        it('should have no errors', function() {
-            imperativeCases.forEach(function(input) {
-                var message = CommitMessage.parse(input.msg);
+        imperativeCases.forEach(function(input) {
+            it('should be valid: ' + input.msg, function(done) {
+                CommitMessage.parse(input.msg, function(err, message) {
+                    if (err) return done(err);
 
-                assert.deepEqual(message._errors, [], 'Message was:\n' + input.msg);
+                    assert.deepEqual(message._errors, []);
+                    done();
+                });
             });
         });
 
-        it('should have error', function() {
-            nonImperativeCases.forEach(function(input) {
-                var err = new Error('Use imperative present tense, eg. "Fix bug" not ' +
+        nonImperativeCases.forEach(function(input) {
+            it('should be invalid: ' + input.msg, function(done) {
+                var error = new Error('Use imperative present tense, eg. "Fix bug" not ' +
                 '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
                 'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, input.location);
-                var message = CommitMessage.parse(input.msg);
+                CommitMessage.parse(input.msg, function(err, message) {
+                    if (err) return done(err);
 
-                assert.deepEqual(message._errors, [err], 'Message was:\n' + input.msg);
+                    assert.deepEqual(message._errors, [error]);
+                    done();
+                });
             });
         });
     }); // end non-imporative verbs
 
     describe('#parseFromFile', function() {
-        describe('valid file', function() {
-            var file = path.resolve(__dirname, 'resources/COMMIT_EDITMSG');
-            var message = CommitMessage.parseFromFile(file);
-            var failMsg = 'Message read from ' + path.relative(
-                path.resolve(__dirname, '..'), file
-            );
+        var file = path.resolve(__dirname, 'resources/COMMIT_EDITMSG');
+        var relativeFile = path.relative(path.resolve(__dirname, '..'), file);
 
-            it('should have 0 errors', function() {
-                assert.deepEqual(message._errors, [], failMsg);
-            });
+        it('should parse correctly ' + relativeFile, function(done) {
+            CommitMessage.parseFromFile(file, function(err, message) {
+                if (err) return done(err);
 
-            it('should have the correct title', function() {
+                assert.deepEqual(message._errors, []);
                 assert.equal(message._title,
                     'Fix broken crypto_register_instance() module');
+
+                done();
             });
         });
     });

@@ -40,41 +40,45 @@ if (!program.args.length || typeof repository === 'undefined') {
 var totalCommits = 0;
 var validCommits = 0;
 var commitsWithWarn = 0;
-var processCommit = function(err, commit) {
+var processCommit = function(err, commit, cb) {
     if (err) {
         console.error(err.toString());
         process.exit(1);
     }
 
-    try {
-        var msg = CommitMessage.parse(commit, true);
-    } catch(e) {
-        console.log('Commit was:', program.noColors ? commit : chalk.cyan(commit));
-        throw e;
-    }
-    totalCommits++;
-    if (!msg.hasErrors()) {
-        validCommits++;
-        if (msg.hasWarnings()) {
-            commitsWithWarn++;
+    CommitMessage.parse(commit, true, function(err, msg) {
+        if (err) {
+            console.log('Commit was:', program.noColors ? commit : chalk.cyan(commit));
+            throw e;
         }
-    }
-    var hasMessages = msg.hasErrors() || msg.hasWarnings();
-    var log = msg.hasErrors() ? console.error : console.log;
-    var logError = function(s) {
-        log(program.verbose || program.noColors ? s : chalk.red(s));
-    };
-    var logValid = function(s) {
-        log(program.noColors ? s : chalk.green(s));
-    };
-    var logCommit = msg.hasErrors() ? logError : logValid;
 
-    log('-------------------------------------------------------------------------------');
-    logCommit(commit);
-    if (hasMessages && program.verbose) {
-        log(msg.formattedMessages);
-    }
-    log('-------------------------------------------------------------------------------');
+        totalCommits++;
+
+        if (!msg.hasErrors()) {
+            validCommits++;
+            if (msg.hasWarnings()) {
+                commitsWithWarn++;
+            }
+        }
+        var hasMessages = msg.hasErrors() || msg.hasWarnings();
+        var log = msg.hasErrors() ? console.error : console.log;
+        var logError = function(s) {
+            log(program.verbose || program.noColors ? s : chalk.red(s));
+        };
+        var logValid = function(s) {
+            log(program.noColors ? s : chalk.green(s));
+        };
+        var logCommit = msg.hasErrors() ? logError : logValid;
+
+        log('-------------------------------------------------------------------------------');
+        logCommit(commit);
+        if (hasMessages && program.verbose) {
+            log(msg.formattedMessages);
+        }
+        log('-------------------------------------------------------------------------------');
+
+        cb();
+    });
 }
 var finish = function() {
     if (program.verbose) {
@@ -117,8 +121,7 @@ function GitHub(opts, cb) {
                 res.headers['x-ratelimit-limit']);
             }
             if (res.statusCode !== 200) {
-                cb(new Error(res.statusMessage));
-                return;
+                return cb(new Error(res.statusMessage));
             }
 
             var body = '';
@@ -127,19 +130,23 @@ function GitHub(opts, cb) {
             });
 
             res.on('end', function () {
-                var commits = JSON.parse(body);
-
-                commits.every(function(record) {
-                    cb(null, record.commit.message);
-                    return ++ct < limit;
-                });
-
-                if (!(ct >= limit || commits.length < defaultLimit)) {
-                    options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1);
-                    get();
-                } else {
-                    finish();
+                var commits = JSON.parse(body).slice(0, limit-ct);
+                ct += commits.length;
+                var more = !(ct >= limit || commits.length < defaultLimit);
+                var handleCommit = function() {
+                    var c = commits.shift();
+                    if (!c) {
+                        if (more) {
+                            options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1);
+                            get();
+                        } else {
+                            finish();
+                        }
+                        return;
+                    }
+                    cb(null, c.commit.message, handleCommit);
                 }
+                handleCommit();
             });
         });
     }

@@ -71,7 +71,7 @@ describe('nlp-parser', function() {
         assert.deepEqual(removeCircularRefs(got), removeCircularRefs(want));
     });
 
-    it('should parse sentences correctly', function() {
+    it('should parse sentences correctly', function(done) {
         this.timeout(5000); // allow enough time
 
         var sentences = [
@@ -80,17 +80,21 @@ describe('nlp-parser', function() {
            'Fixed bug in landing page',
            'Bug fixes when building target'
         ];
-        var instances = Parser.parseSentencesSync(sentences, 'newline');
+        Parser.parseSentences(sentences, 'newline', function(err, instances) {
+            if (err) return done(err);
 
-        assert.equal(instances[0]._wordsAndTags, wordsAndTags);
-        assert.deepEqual(removeCircularRefs(instances[0]._penn), removeCircularRefs(pennParsed));
-        assert(!instances[1].hasVerb(), 'Sentence "' + instances[1]._wordsAndTags +
-        '" has hasVerb===true while should be false');
-        assert(instances[2].hasVerb(), 'Sentence "' + instances[2]._wordsAndTags +
-        '" has hasVerb===false while should be true');
+            assert.equal(instances.length, sentences.length);
+            assert.equal(instances[0]._wordsAndTags, wordsAndTags);
+            assert.deepEqual(removeCircularRefs(instances[0]._penn), removeCircularRefs(pennParsed));
+            assert(!instances[1].hasVerb(), 'Sentence "' + instances[1]._wordsAndTags +
+            '" has hasVerb===true while should be false');
+            assert(instances[2].hasVerb(), 'Sentence "' + instances[2]._wordsAndTags +
+            '" has hasVerb===false while should be true');
+            done();
+        });
     });
 
-    it('should work without node-java', function() {
+    it('should work without node-java', function(done) {
         this.timeout(5000); // allow enough time on Travis
 
         var sentences = [
@@ -98,25 +102,28 @@ describe('nlp-parser', function() {
            'Fix home page styling'
         ];
         var parserFn = Parser.parser;
-        Parser.parser = function() { return false; }
-        var instances = Parser.parseSentencesSync(sentences, 'newline');
-        Parser.parser = parserFn;
+        Parser.parser = function(cb) { cb(null, null); }
+        Parser.parseSentences(sentences, 'newline', function(err, instances) {
+            Parser.parser = parserFn;
+            if (err) return done(err);
 
-        assert.equal(instances[0]._wordsAndTags, 'CSS/NNP fixes/NNS');
-        assert.deepEqual(removeCircularRefs(instances[1].penn), removeCircularRefs(
-            Parser.newPennNode('ROOT', [
-                Parser.newPennNode('S', [
-                    Parser.newPennNode('VP', [
-                        Parser.newPennNode('VB Fix', []),
-                        Parser.newPennNode('NP', [
-                            Parser.newPennNode('NN home', []),
-                            Parser.newPennNode('NN page', []),
-                            Parser.newPennNode('NN styling', [])
+            assert.equal(instances[0]._wordsAndTags, 'CSS/NNP fixes/NNS');
+            assert.deepEqual(removeCircularRefs(instances[1].penn), removeCircularRefs(
+                Parser.newPennNode('ROOT', [
+                    Parser.newPennNode('S', [
+                        Parser.newPennNode('VP', [
+                            Parser.newPennNode('VB Fix', []),
+                            Parser.newPennNode('NP', [
+                                Parser.newPennNode('NN home', []),
+                                Parser.newPennNode('NN page', []),
+                                Parser.newPennNode('NN styling', [])
+                            ])
                         ])
                     ])
-                ])
-            ]))
-        );
+                ]))
+            );
+            done();
+        });
     });
 
 }); // describe nlp-parser
