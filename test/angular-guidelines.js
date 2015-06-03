@@ -41,6 +41,18 @@ var cases = [
         in: ['refactor($compile): remove unused elementTransclusion argument and add some more text to exceed max length'],
         errors: [new Error('Commit subject should not exceed 100 characters',
             Error.ERROR, [1, 100])]
+    },
+    {
+        describe: 'invalid type',
+        in: ['security($compile): remove unused elementTransclusion'],
+        errors: [new Error('Commit subject contains invalid type security($compile):',
+            Error.ERROR, [1, 1])]
+    },
+    {
+        describe: 'no type',
+        in: ['remove unused elementTransclusion'],
+        errors: [new Error('Commit subject should be prefixed by a type',
+            Error.ERROR, [1, 1])]
     }
 ];
 

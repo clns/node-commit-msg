@@ -5,6 +5,9 @@
       "allowedTypes": "^(feat|fix|docs|style|refactor|perf|test|chore)(\\([^)]+\\))?: ",
       "required": true
     },
+    "strictTypes": {
+      "invalidTypes": "(^[^: ]+: )"
+    },
     "capitalized": {
       "capital": false
     },
