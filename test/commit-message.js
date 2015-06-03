@@ -22,7 +22,7 @@ var cases = [
     },
     {
         describe: 'special characters',
-        in: ['Special chars: ./`,()[]\'"_3-~*$={}&;#'],
+        in: ['Special chars: ./`,()[]\'"_3-~*$={}&;#+'],
         errors: []
     },
     {
