@@ -3,10 +3,11 @@
 // clns/node-commit-msg
 // http://git-scm.com/docs/githooks#_commit_msg
 
+var path = require('path');
 var CommitMessage = require('..');
 
 var file = process.argv[2]; // usually '.git/COMMIT_EDITMSG'
-var message = CommitMessage.parseFromFile(file);
+var message = CommitMessage.parseFromFile(file, path.dirname(process.argv[0]));
 
 if (message.hasErrors() || message.hasWarnings()) {
     console.log(message.formattedMessages);
