@@ -56,9 +56,9 @@ var cases = [
         errors: []
     },
     {
-        describe: 'issue reference',
+        describe: 'valid issue reference',
         in: ['Commit with issue ref',
-        'Fixes github/github#12'],
+        'Fixes github/hub#1'],
         errors: []
     },
     {
@@ -184,6 +184,13 @@ var cases = [
         'This body contains a misplaced issue ref.'],
         errors: [new Error('References should be placed in the last paragraph of the body',
         Error.ERROR, [3, 14])]
+    },
+    {
+        describe: 'invalid issue reference',
+        in: ['Commit with invalid issue ref',
+        'Fixes github/hub#123456789'],
+        errors: [new Error('Reference github/hub#123456789 is not valid',
+        Error.ERROR, [3, 1])]
     },
     {
         describe: 'invalid type in commit title with past tense',

@@ -38,4 +38,25 @@ describe('references/github', function() {
         assert.equal(issues[9].match, 'closes example-user/example_repo.git#42');
     });
 
+    it('should validate correctly using the API', function(done) {
+        this.timeout(3000); // allow enough time
+
+        var issues = new Issue.parse('Validate issue references using APIs\n\n' +
+        'Resolve #99999 and resolves github/hub#11-3\n' +
+        'Fix smooth-drawing#1.');
+        var ct = 0;
+        var isDone = function() {
+            ct++;
+            if (ct == issues.length) done();
+        };
+        var results = [false, true, true];
+
+        results.forEach(function(val, idx) {
+            issues[idx].isValid(function(err, valid) {
+                assert.equal(valid, val, issues[idx].toString());
+                isDone();
+            });
+        });
+    });
+
 }); // end GHIssue
