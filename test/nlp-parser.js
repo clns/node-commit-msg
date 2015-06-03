@@ -46,9 +46,12 @@ describe('nlp-parser', function() {
         instance.penn = pennArr.join('\n');
         var instance2 = new Parser();
         instance2.penn = pennArr.join('\r\n');
+        var instance3 = new Parser();
+        instance3.penn = '';
 
         assert.deepEqual(removeCircularRefs(instance._penn), removeCircularRefs(pennParsed));
         assert.deepEqual(removeCircularRefs(instance2._penn), removeCircularRefs(pennParsed));
+        assert.deepEqual(removeCircularRefs(instance3._penn), removeCircularRefs(Parser.newPennNode(null, [])));
     });
 
     it('should correctly use PennNode', function() {

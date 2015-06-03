@@ -145,6 +145,20 @@ var cases = [
         Error.WARNING, [3, cfg.bodyMaxLineLength.length])]
     },
     {
+        describe: 'long body lines (more than 3)',
+        in: ['Correct first line',
+'commit body with very long lines that exceed the 72 characters limit imposed\n' +
+'by git commit message best practices. These practices include the linux kernel\n' +
+'and the git source. This commit body contains more than 3 lines that exceed the\n' +
+'max length. This sentence is added to make sure this line exceeds the limit we need.'],
+        errors: [new Error(util.format('There are %d lines in the commit body ' +
+        'that are longer than %d characters. Body lines should ' +
+        'not exceed %d characters, except for compiler error ' +
+        'messages or other "non-prose" explanation',
+        4, cfg.bodyMaxLineLength.length, cfg.bodyMaxLineLength.length),
+        Error.WARNING, [3, cfg.bodyMaxLineLength.length])]
+    },
+    {
         describe: 'invalid whitespace (space)',
         in: ['Commit  with 2 consecutive spaces'],
         errors: [new Error('Commit subject contains invalid whitespace',
@@ -217,12 +231,15 @@ describe('CommitMessage', function() {
             var errNo = t.errors.length;
             var itFn = t.skip ? it.skip : it;
             var expectErrors = !t.errors.every(function(e) { return !e.is(Error.ERROR); });
+            var expectWarnings = !t.errors.every(function(e) { return !e.is(Error.WARNING); });
 
             itFn(util.format('should parse %s', t.describe), function(done) {
                 CommitMessage.parse(input, cfg, function(err, message) {
                     if (err) return done(err);
 
                     assert.deepEqual(message._errors, t.errors, failMsg);
+                    assert.equal(message.hasErrors(), expectErrors, failMsg);
+                    assert.equal(message.hasWarnings(), expectWarnings, failMsg);
 
                     if (!message.hasErrors() && !expectErrors) {
                         assert.equal(message._title, t.in[0], failMsg);
@@ -277,6 +294,13 @@ describe('CommitMessage', function() {
                 assert.equal(message._title,
                     'Fix broken crypto_register_instance() module');
 
+                done();
+            });
+        });
+
+        it('should return error for non-existing file', function(done) {
+            CommitMessage.parseFromFile('non-existing-file', function(err, message) {
+                assert.equal(err.code, 'ENOENT');
                 done();
             });
         });
