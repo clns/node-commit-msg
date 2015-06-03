@@ -7,7 +7,7 @@ var path = require('path');
 var CommitMessage = require('..');
 
 var file = process.argv[2]; // usually '.git/COMMIT_EDITMSG'
-CommitMessage.parseFromFile(file, path.dirname(process.argv[0]), function(err, message) {
+CommitMessage.parseFromFile(file, path.dirname(file), function(err, message) {
     if (message.hasErrors() || message.hasWarnings()) {
         console.log(message.formattedMessages);
     }
