@@ -67,6 +67,7 @@ describe('angular guidelines', function() {
         var expectWarnings = !t.errors.every(function(e) { return !e.is(Error.WARNING); });
 
         itFn(util.format('should parse %s', t.describe), function(done) {
+            this.timeout(3000); // allow enough time
             CommitMessage.parse(input, configBaseDir, function(err, message) {
                 if (err) return done(err);
 
