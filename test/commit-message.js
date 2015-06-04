@@ -10,6 +10,11 @@ var Error = require('../lib/error');
 var cfg = Config({
     imperativeVerbsInTitle: {
         alwaysCheck: true
+    },
+    references: {
+        github: {
+            token: process.env.GITHUB_TOKEN
+        }
     }
 });
 

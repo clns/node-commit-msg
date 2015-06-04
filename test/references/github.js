@@ -41,9 +41,14 @@ describe('references/github', function() {
     it('should validate correctly using the API', function(done) {
         this.timeout(3000); // allow enough time
 
+        var cfg;
+        if (process.env.GITHUB_TOKEN) {
+            cfg = {references: {github: {token: process.env.GITHUB_TOKEN}}};
+        }
+
         var issues = new Issue.parse('Validate issue references using APIs\n\n' +
         'Resolve #99999 and resolves github/hub#11-3\n' +
-        'Fix smooth-drawing#1.');
+        'Fix smooth-drawing#1.', cfg);
         var ct = 0;
         var isDone = function() {
             ct++;
