@@ -7,25 +7,27 @@ and/or directly through the API.
 
 ### Default validations
 
-- Title and body should be separated by an empty line, if body exists
+- Subject and body should be separated by an empty line, if body exists
 (*error* | *configurable*)
-- Title should be capitalized (*error* | *configurable*)
-- Soft and hard limits for title length (50 and 70)
-(*warning, error* | *configurable*)
-- No consecutive whitespaces allowed in title (*error*)
-- Title should not end with a period or whitespace (*error*)
-- Only certain special characters are allowed in the title
-(*error* | *configurable*)
-- Basic detection of non-imperative verbs, eg. "Fix bug" not "Fixes bug" or
-"Fixed bug" (*warning* | *configurable*)
+- Subject should be capitalized (*error* | *configurable*)
+- Subject has a soft and hard limit for max length (50 and 70)
+(*warning* and *error* | *configurable*)
+- No consecutive whitespaces allowed in subject (*error*)
+- Subject should not end with a period or whitespace (*error*)
+- Only [certain special characters](lib/config.js#L17) are allowed
+in the subject (*error* | *configurable*)
+- Subject can be prefixed with certain [type: component: ](lib/config.js#L27)
+and [invalid types](lib/config.js#L34) can de detected
 - [GitHub issue references](https://help.github.com/articles/closing-issues-via-commit-messages/)
-should be placed in the last paragraph of the body (*warning* | *configurable*)
-- Body should start with first letter capitalized (*error* | *configurable*)
+should be placed in the last paragraph of the body and they should
+exist on GitHub (*error* | *configurable*)
+- Detection of non-imperative verbs in subject, eg. "Fix bug" not "Fixes bug" or
+"Fixed bug" (*error* | *configurable*)
 - Body lines should be wrapped at 72 characters (*warning* | *configurable*)
 
 ### Disclaimer
 
-Only use it if you agree with the guidelines it follows and
+> Only use it if you agree with the guidelines it follows and
 if the customization it offers is enough to meet your needs. I will not accept
 changes that do not adhere to the basic rules outlined in the
 [best practices](CONTRIBUTING.md#commit-message) document, unless they come
@@ -33,95 +35,137 @@ with very compelling reasons.
 
 ## Installation
 
+#### Prerequisites
+
+- Node.js 0.12 or newer
+- Java 8 or newer (required by the parser)
+
+Optional:
+
+- Python 2.7 (Python 3.x is *not* supported)
+- Make sure you have the Java JDK installed not just JRE
+
+> It's recommended to install the optional dependencies as well
+to be able to use the parser's API directly instead of running
+shell commands.
+
+#### Install
+
+> On Windows, make sure you run the command below using *administrator* rights.
+Eg. open PowerShell using *Run as administrator*.
+
 ```sh
-$ npm install commit-msg --save-dev
+npm install commit-msg --save-dev
 ```
 
-This will also install (symlink) the `commit-msg` hook in your project's
-`.git/hooks/` dir. To disable the auto-install see the
-[Configuration](#configuration) section.
+This will also install (symlink) the [commit-msg](bin/commit-msg) hook
+in your project's `.git/hooks/` directory so you are ready to start committing.
+To disable the auto-install see the [Configuration](#configuration) section.
 
 ## Configuration
 
 You can configure this module by specifying a `commitMsg` key in your
-`package.json` file. The current configurations are:
+`package.json` file. Possible configurations are:
 
-- `noHook` (Boolean, false) Set to true to disable the git hook auto-install
-- `config` (Object) For the default config take a look at the
-[config object](lib/commit-message.js) in the code.  
-  TODO: not there yet
+- `noHook` (Boolean) Set to `true` to disable the git hook auto-install
+- [any key from the default `config` object](lib/config.js)
 
-###### Example `package.json` config
-
-```json
-{
-  "name": "your-module",
-  "version": "0.0.0",
-  "devDependencies": {
-    "commit-msg": "^1.0.0"
-  },
-  "commitMsg": {
-    "noHook": true
-  }
-}
-```
+For [an example](test/resources/angular/package.json) check out
+[Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit)
+config file.
 
 ## Usage
 
-TODO
+A first example is the [commit-msg](bin/commit-msg) hook. For another example
+you can check the [validate](bin/validate) script. For more usages
+check the [test files](test).
+
+### API
+
+#### `CommitMessage`
+
+##### `CommitMessage.parse(message[, config], callback)`
+
+- `message` (string) The message to parse
+- `config` (true|string|[Config](#commitmessage-config), optional) The config object,
+a string or `true`.
+  - if `true` is given, it will search for the first package.json file
+  starting from the current directory up, and use the `commitMsg`
+  config from it, if any.
+  - if string is given, it should be a directory path where the search for
+  the package.json file will start, going up
+  - if object is given, it will overwrite the default config object
+- `callback(err, instance)` (function) The callback that will be called
+with the following params:
+  - `err` (Error)
+  - `instance` ([CommitMessage](#commitmessage))
+
+This is the designated initializer.
+
+##### `CommitMessage.parseFromFile(file[, config], callback)`
+
+- `file` (string) The file path to parse the message from
+- *(all other arguments are the same as above)*
+
+##### `<commitMessageInstance>.message: string`
+
+Return the original message as a string. Note that this will *not* include
+any comments or other text that will not be included in the commit message
+by git, eg. the extra output from `git commit -v`.
+
+##### `<commitMessageInstance>.formattedMessages: string`
+
+Return all errors and warnings as a string, one per line, in the same order
+as they were generated, including colors.
+
+##### `<commitMessageInstance>.validate(callback)`
+
+- `callback(err, instance)` (function) The callback that will be called
+after the validation finishes
+  - `err` (Error)
+  - `instance` ([CommitMessage](#commitmessage))
+
+##### `<commitMessageInstance>.hasErrors(): boolean`
+
+Return true if there are any errors after validation.
+
+##### `<commitMessageInstance>.hasWarnings(): boolean`
+
+Return true if there are any warnings after validation.
+
+#### `CommitMessage.Config`
+
+##### `CommitMessage.Config([cfg]): object`
+
+- `cfg` (object, optional) An object that will overwrite the [default
+config object](lib/config.js).
+
+For example, to generate a warning instead of an error for the
+capitalized first letter check you can use:
 
 ```js
-var ContentRange = require('http-range').ContentRange;
-var Range = require('http-range').Range;
-
-// Parsing and creating 'Content-Range' header
-ContentRange.prototype.parse('bytes 0-49/50');  // Content-Range: bytes 0-49/50
-new ContentRange('bytes', '0-49', 50).toString(); // => bytes 0-49/50
-
-// Parsing and creating 'Range' header
-Range.prototype.parse('bytes=0-49');  // Range: bytes=0-49
-new Range('bytes', '0-49'); // => bytes=0-49
+CommitMessage.parse(msg, CommitMessage.Config({
+    capitalized: { type: Error.WARNING }
+}), function(err, instance) {
+    // do something with the result
+});
 ```
 
-For more usages check the [test files](test).
+#### `CommitMessage.Error`
 
-#### Bypass validation
+##### `CommitMessage.Error.ERROR: string`
+##### `CommitMessage.Error.WARNING: string`
+
+### Bypass validation
 
 If you know what you're doing you can skip the validation
 altogether using `git commit --no-verify`. Be aware that this
 will bypass the *pre-commit* and *commit-msg* hooks.
 
-## API
-
-TOOD
-
 ## Tests
 
-```sh
-$ npm test
-```
-
-You can also run the validator against external repositories from GitHub
-that are known for using good commit messages. Note that these requests
-will count against your GitHub
-[Rate Limiting](https://developer.github.com/v3/#rate-limiting) policy.  
-For example, the following command will run against the latest commits
-from repositories like [git/git](https://github.com/git/git/commits/master)
-and [torvalds/linux](https://github.com/torvalds/linux/commits/master):
+Make sure you ran `npm install` prior to running the tests.
 
 ```sh
-$ npm run test-external
+npm test
 ```
-
-To run all tests use:
-
-```sh
-$ npm run test-all
-```
-
-## Known issues
-
-- Doesn't work with `git commit -v`
-- Should not validate what git considers an empty commit message
-(a message that includes only comments or lines not considered
-part of the commit message)
