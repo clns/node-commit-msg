@@ -7,7 +7,10 @@ jdk:
   - oraclejdk8
 
 env:
-  - NODE_VERSION=0.12
+  matrix:
+    - NODE_VERSION=0.12
+  global:
+    secure: D1awgJ6oeOZqv8J70k0aHoZUIP3CirToSOOkbjHT6Tb5LQ5dTeKi+IoxjgSVta3CUHmqW1nJXghN3gL9hRP9uhkE1iS4Hdn4anDVxF6bEr5hIa/BuH2CI4y+A1f36SvIcfbv06UrXgpqmoXZqY7Yb51tUHQtqVfJnowgKIMDCCU=
 
 install:
   - nvm install $NODE_VERSION
