@@ -68,19 +68,24 @@ describe('angular guidelines', function() {
 
         itFn(util.format('should parse %s', t.describe), function(done) {
             this.timeout(3000); // allow enough time
-            CommitMessage.parse(input, configBaseDir, function(err, message) {
-                if (err) return done(err);
-
-                assert.deepEqual(message._errors, t.errors, failMsg);
-                assert.equal(message.hasErrors(), expectErrors, failMsg);
-                assert.equal(message.hasWarnings(), expectWarnings, failMsg);
-
-                if (!message.hasErrors() && !expectErrors) {
-                    assert.equal(message._title, t.in[0], failMsg);
-                    assert.equal(message._body, t.in[1], failMsg);
+            CommitMessage.resolveConfig(configBaseDir, function(cfg) {
+                if (process.env.GITHUB_TOKEN) {
+                    cfg.references.github.token = process.env.GITHUB_TOKEN;
                 }
+                CommitMessage.parse(input, cfg, function(err, message) {
+                    if (err) return done(err);
 
-                done();
+                    assert.deepEqual(message._errors, t.errors, failMsg);
+                    assert.equal(message.hasErrors(), expectErrors, failMsg);
+                    assert.equal(message.hasWarnings(), expectWarnings, failMsg);
+
+                    if (!message.hasErrors() && !expectErrors) {
+                        assert.equal(message._title, t.in[0], failMsg);
+                        assert.equal(message._body, t.in[1], failMsg);
+                    }
+
+                    done();
+                });
             });
         });
     }); // end cases.forEach
