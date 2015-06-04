@@ -8,8 +8,8 @@
     "hook-uninstall": "node lib/setup uninstall",
     "postinstall": "npm run hook",
     "preuninstall": "npm run hook-uninstall",
-    "test": "mocha --reporter spec --slow 5 --check-leaks test/**",
-    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec test/** && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+    "test": "mocha --reporter spec --slow 5 --check-leaks test/*.js test/**/*.js",
+    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec test/*.js test/**/*.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "repository": {
     "type": "git",
