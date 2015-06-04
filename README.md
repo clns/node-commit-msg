@@ -68,7 +68,7 @@ You can configure this module by specifying a `commitMsg` key in your
 `package.json` file. Possible configurations are:
 
 - `noHook` (Boolean) Set to `true` to disable the git hook auto-install
-- [any key from the default `config` object](lib/config.js)
+- [any key from the default `config` object](lib/config.js#L8)
 
 For [an example](test/resources/angular/package.json) check out
 [Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit)
@@ -87,7 +87,7 @@ check the [test files](test).
 ##### `CommitMessage.parse(message[, config], callback)`
 
 - `message` (string) The message to parse
-- `config` (true|string|[Config](#commitmessage-config), optional) The config object,
+- `config` (true|string|[Config](#commitmessageconfig), optional) The config object,
 a string or `true`.
   - if `true` is given, it will search for the first package.json file
   starting from the current directory up, and use the `commitMsg`
@@ -137,11 +137,11 @@ Return true if there are any warnings after validation.
 
 ##### `CommitMessage.Config([cfg]): object`
 
-- `cfg` (object, optional) An object that will overwrite the [default
-config object](lib/config.js).
+- `cfg` (object, optional) An object that will overwrite the
+[default config object](lib/config.js#L8).
 
 For example, to generate a warning instead of an error for the
-capitalized first letter check you can use:
+capitalized first letter check use:
 
 ```js
 CommitMessage.parse(msg, CommitMessage.Config({
