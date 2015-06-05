@@ -216,14 +216,17 @@ var cases = [
             },
             types: {required: true}
         })
+    },
+    {
+        describe: 'invalid issue reference should not be validated against the API',
+        in: ['Invalid issue ref should not validate with API.',
+        'Fixes github/hub#123456789'],
+        errors: [new Error('Commit subject should not end with a period or whitespace',
+        Error.ERROR, [1, 47])]
     }
 ];
 
 var imperativeCases = [
-    // This was throwing an exception because the two sentences
-    // 'Add install atom script for OS X.' and 'I Add install atom script for OS X.'
-    // are treated as one sentece because of the 'OS X.' termination ('X.' is
-    // considered a word instead of only 'X' without the dot)
     {msg: 'Add install atom script for OS X'},
     // Thinks it's not in imperative mood
     {msg: 'Don\'t create delta for .bz2 files'}
@@ -238,8 +241,7 @@ var nonImperativeCases = [
     {msg: 'Manually merged changes into master', location: [1, 10]},
     {msg: 'Sending the old record to the gateway', location: [1, 1]},
     {msg: 'Included new library', location: [1, 1]},
-    // This was throwing an exception because it doesn't parse as a sentence S.
-    // It's also not detected correctly as past tense because of
+    // It's not detected correctly as past tense because of
     // the <type>: prefix which confuses the parser
     {msg: 'docs: Updated Bulgarian translation', location: [1, 7]}
     // {msg: 'Disabled password validation', location: [1, 1]}
@@ -258,7 +260,7 @@ describe('CommitMessage', function() {
             var expectWarnings = !t.errors.every(function(e) { return !e.is(Error.WARNING); });
             var config = t.config || cfg;
 
-            itFn(util.format('should parse %s', t.describe), function(done) {
+            itFn(util.format('%s', t.describe), function(done) {
                 CommitMessage.parse(input, config, function(err, message) {
                     if (err) return done(err);
 
