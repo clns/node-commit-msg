@@ -1,7 +1,42 @@
 # How to contribute
 
-Read the [Contributing to a Project](https://guides.github.com/activities/contributing-to-open-source/#contributing)
-GitHub guide.
+Make sure you're familiar with GitHub's [Contributing to a Project](https://guides.github.com/activities/contributing-to-open-source/#contributing)
+guide.
+
+## Getting Started
+
+1. Clone the repository to your preferred location
+
+  ```sh
+  git clone https://github.com/clns/node-commit-msg
+  cd node-commit-msg
+  ```
+
+2. Try to have the optional prerequisites installed. These are needed by
+[node-java](https://github.com/joeferner/node-java) and it greatly improves
+the parser speed (especially when running the tests) because it accesses
+the Java API directly instead of calling shell commands and having to load
+the parser model each time.
+
+  - Python 2.7 (Python 3.x is *not* supported)
+  - Java JDK 8 (make sure you have the JDK installed not just JRE)
+
+3. Install dependencies
+
+  ```sh
+  npm install
+  ```
+
+4. Start coding
+
+  - Please add/update the tests for every change you make
+  - When committing, make sure you're following [the rules](#commit-message)
+
+### Tests
+
+```sh
+npm test
+```
 
 ## Commit Message
 

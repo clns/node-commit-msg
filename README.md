@@ -14,10 +14,10 @@ and/or directly through the API.
 (*warning* and *error* | *configurable*)
 - No consecutive whitespaces allowed in subject (*error*)
 - Subject should not end with a period or whitespace (*error*)
-- Only [certain special characters](lib/config.js#L17) are allowed
+- Only [certain special characters](lib/config.js#L19) are allowed
 in the subject (*error* | *configurable*)
-- Subject can be prefixed with certain [type: component: ](lib/config.js#L27)
-and [invalid types](lib/config.js#L34) can de detected
+- Subject can be prefixed with certain [type: component: ](lib/config.js#L29)
+and [invalid types](lib/config.js#L36) can de detected
 - [GitHub issue references](https://help.github.com/articles/closing-issues-via-commit-messages/)
 should be placed in the last paragraph of the body and they should
 exist on GitHub (*error* | *configurable*)
@@ -37,17 +37,11 @@ with very compelling reasons.
 
 #### Prerequisites
 
-- Node.js 0.12 or newer
-- Java 8 or newer (required by the parser)
-
-Optional:
-
-- Python 2.7 (Python 3.x is *not* supported)
-- Make sure you have the Java JDK installed not just JRE
-
-> It's recommended to install the optional dependencies as well
-to be able to use the parser's API directly instead of running
-shell commands.
+- [Node.js](https://nodejs.org/) 0.12 or newer (to check the current version
+run `node -v` in a cli)
+- [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+or newer (required by the parser) (to check the current version run
+`java -version` in a cli)
 
 #### Install
 
@@ -60,7 +54,7 @@ npm install commit-msg --save-dev
 
 This will also install (symlink) the [commit-msg](bin/commit-msg) hook
 in your project's `.git/hooks/` directory so you are ready to start committing.
-To disable the auto-install see the [Configuration](#configuration) section.
+To disable the auto-install check out [Configuration](#configuration).
 
 ## Configuration
 
@@ -69,6 +63,7 @@ You can configure this module by specifying a `commitMsg` key in your
 
 - `noHook` (Boolean) Set to `true` to disable the git hook auto-install
 - [any key from the default `config` object](lib/config.js#L8)
+- see [disable validation](#disable-validation) to turn it off once installed
 
 For [an example](test/resources/angular/package.json) check out
 [Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit)
@@ -156,16 +151,38 @@ CommitMessage.parse(msg, CommitMessage.Config({
 ##### `CommitMessage.Error.ERROR: string`
 ##### `CommitMessage.Error.WARNING: string`
 
+### Disable validation
+
+You can disable the validation by setting `commitMsg: {disable: true, ...}`
+in your package.json file.
+
 ### Bypass validation
 
 If you know what you're doing you can skip the validation
 altogether using `git commit --no-verify`. Be aware that this
 will bypass the *pre-commit* and *commit-msg* hooks.
 
-## Tests
+## Troubleshooting
 
-Make sure you ran `npm install` prior to running the tests.
+#### Install errors
 
-```sh
-npm test
+##### MSB4019: The imported project "D:\Microsoft.Cpp.Default.props" was not found.
+
 ```
+MSB4019: The imported project "D:\Microsoft.Cpp.Default.props" was not found.
+Confirm that the path in the <Import> de claration is correct, and that the file exists on disk.
+gyp ERR! build error
+gyp ERR! stack Error: `C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe` failed with exit code: 1
+...
+npm WARN optional dep failed, continuing java@0.5.4
+```
+
+This is an optional dependency and the validator will work fine without it,
+so you don't need to do anything.
+
+#### Commit errors
+
+##### /usr/bin/env: node: No such file or directory
+
+This means that Node.js is not in your PATH. Make sure you have it available
+and restart any program (or console) that you're using to commit.
