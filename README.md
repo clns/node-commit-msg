@@ -35,7 +35,7 @@ with very compelling reasons.
 
 ## Installation
 
-#### Prerequisites
+### Prerequisites
 
 - [Node.js](https://nodejs.org/) 0.12 or newer (to check the current version
 run `node -v` in a cli)
@@ -43,18 +43,32 @@ run `node -v` in a cli)
 or newer (required by the parser) (to check the current version run
 `java -version` in a cli)
 
-#### Install
+### Install
 
-> On Windows, make sure you run the command below using *administrator* rights.
+> The commands below should be run from your project's root
+directory (where `.git` is).
+
+> IMPORTANT: On Windows, make sure you run the commands below
+using *administrator* rights.
 Eg. open PowerShell using *Run as administrator*.
 
 ```sh
-npm install commit-msg --save-dev
+npm install https://github.com/clns/node-commit-msg --save-dev
 ```
 
 This will also install (symlink) the [commit-msg](bin/commit-msg) hook
 in your project's `.git/hooks/` directory so you are ready to start committing.
 To disable the auto-install check out [Configuration](#configuration).
+
+#### Update
+
+Just run the install command again.
+
+#### Uninstall
+
+```sh
+npm uninstall commit-msg
+```
 
 ## Configuration
 
@@ -139,17 +153,54 @@ For example, to generate a warning instead of an error for the
 capitalized first letter check use:
 
 ```js
-CommitMessage.parse(msg, CommitMessage.Config({
-    capitalized: { type: Error.WARNING }
-}), function(err, instance) {
-    // do something with the result
-});
+CommitMessage.parse(
+    msg,
+    CommitMessage.Config({
+        capitalized: { type: CommitMessage.Error.WARNING }
+    }),
+    function(err, instance) { /* ... */ }
+);
 ```
 
 #### `CommitMessage.Error`
 
 ##### `CommitMessage.Error.ERROR: string`
+
+The "error" string.
+
 ##### `CommitMessage.Error.WARNING: string`
+
+The "warning" string.
+
+### Manual validation
+
+The validator includes a script for validating messages
+directly from the command line. It is located at
+`bin/validate` and you can access it from anywhere using:
+
+```sh
+node <path-to-bin/validate> -h
+
+# example from your project root
+node node_modules/commit-msg/bin/validate -h
+```
+
+##### Validate any given message
+
+```sh
+node node_modules/commit-msg/bin/validate 'Fix bug
+
+This is the first line of the commit body.'
+```
+
+##### Validate last 10 commits made by &lt;Author&gt;
+
+```sh
+# don't forget to replace <Author>
+git log --oneline --all -10 --author='<Author>' | node node_modules/commit-msg/bin/validate stdin
+```
+
+For more examples see the script help.
 
 ### Disable validation
 
@@ -164,7 +215,7 @@ will bypass the *pre-commit* and *commit-msg* hooks.
 
 ## Troubleshooting
 
-#### Install errors
+### Install errors
 
 ##### MSB4019: The imported project "D:\Microsoft.Cpp.Default.props" was not found.
 
@@ -180,9 +231,11 @@ npm WARN optional dep failed, continuing java@0.5.4
 This is an optional dependency and the validator will work fine without it,
 so you don't need to do anything.
 
-#### Commit errors
+### Commit errors
 
 ##### /usr/bin/env: node: No such file or directory
 
-This means that Node.js is not in your PATH. Make sure you have it available
-and restart any program (or console) that you're using to commit.
+This means that Node.js is not in your PATH, or the program
+you're using to commit doesn't know about it. Try restarting
+the program and if this doesn't fix the issue a log-off
+(or restart) will most likely fix it.
