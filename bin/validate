@@ -13,32 +13,34 @@ var https = require('https');
 var util = require('util');
 var chalk = require('chalk');
 var fs = require('fs');
+var path = require('path');
 var execSync = require('child_process').execSync;
 var readline = require('readline');
 var CommitMessage = require('..');
+var executable = path.relative(process.cwd(), process.argv[1]);
 
 program
     .description('Validate commit messages and output all valid commmits to ' +
     'stdout and invalid ones to stderr.\n\n' +
     '  Examples:\n\n' +
     '    # validate messages directly\n' +
-    '    node bin/validate \'Fix bug\' \'Change color\'\n' +
+    '    node '+executable+' \'Fix bug\' \'Change color\'\n' +
     '\n' +
     '    # validate last 5 commits (not including merge commits)\n' +
-    '    git log --oneline --all --no-merges -5 | node bin/validate stdin\n' +
-    '    git log --oneline --all --since="2 weeks ago" | node bin/validate stdin\n' +
+    '    git log --oneline --all --no-merges -5 | node '+executable+' stdin\n' +
+    '    git log --oneline --all --since="2 weeks ago" | node '+executable+' stdin\n' +
     '    # validate last 3 commits and show list of paths each commit modified\n' +
-    '    git log --oneline --all -3 | node bin/validate stdin -o \'--name-status\'\n' +
+    '    git log --oneline --all -3 | node '+executable+' stdin -o \'--name-status\'\n' +
     '    # validate all commits made by \'<Author>\' (regex)\n' +
-    '    git log --oneline --all --author=\'<Author>\' | node bin/validate stdin\n' +
+    '    git log --oneline --all --author=\'<Author>\' | node '+executable+' stdin\n' +
     '    # show only commits that have warnings (Unix only)\n' +
-    '    git log --oneline --all | node bin/validate stdin | grep -B 7 -A 2 \'^warning \'\n' +
+    '    git log --oneline --all | node '+executable+' stdin | grep -B 7 -A 2 \'^warning \'\n' +
     '\n' +
     '    # validate github repositories\n' +
-    '    node bin/validate github clns/node-commit-msg\n' +
-    '    node bin/validate github -t <https://github.com/settings/tokens> git/git\n' +
-    '    node bin/validate github -v -l 120 torvalds/linux\n' +
-    '    node bin/validate github -c test/resources/angular angular/angular.js')
+    '    node '+executable+' github clns/node-commit-msg\n' +
+    '    node '+executable+' github -t <https://github.com/settings/tokens> git/git\n' +
+    '    node '+executable+' github -v -l 120 torvalds/linux\n' +
+    '    node '+executable+' github -c test/resources/angular angular/angular.js')
     .option('--no-colors', 'output without any colors')
     .option('-c, --config [s]', 'the dir path to the package.json config to use', process.cwd());
 
