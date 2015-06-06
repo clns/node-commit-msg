@@ -1,106 +1,148 @@
 #!/usr/bin/env node
 
-// Executable script that processes a given GitHub repo's commits
-// against the validator and outputs all valid commmits to stdout
-// and invalid ones to stderr.
+// This script validates commit messages using the validator and outputs
+// valid commits to stdout and invalid ones to stderr.
 //
-// Help:
+// For more details see the help:
 //
-//     $ ./bin/validate -h
+//   $ node bin/validate -h
+//
 
 var program = require('commander');
 var https = require('https');
 var util = require('util');
 var chalk = require('chalk');
+var fs = require('fs');
+var execSync = require('child_process').execSync;
+var readline = require('readline');
 var CommitMessage = require('..');
 
 program
-  .usage('[options] <repository>')
-  .description('Process a GitHub repo\'s commits against the validator and\n' +
-  'output all valid commmits to stdout and invalid ones to stderr.\n\n' +
-  '  Examples:\n\n\t ./bin/validate clns/node-commit-msg\n' +
-  '\t ./bin/validate git/git -v\n' +
-  '\t ./bin/validate torvalds/linux -v -l 120\n' +
-  '\t ./bin/validate tpope/vim-pathogen -v -t \'<https://github.com/settings/tokens>\'\n' +
-  '\t ./bin/validate angular/angular.js -v -c test/resources/angular')
-  .option('-t, --token [s]', 'GitHub token; if not specified it will fetch anonymously')
-  .option('-l, --limit [n]', 'how many commits to process, default is 30', 30)
-  .option('--no-colors', 'output without any colors')
-  .option('-c, --config [s]', 'the package.json config base dir to use', true)
-  .option('-v, --verbose', 'display warnings and errors after validation')
-  .arguments('<repository>')
-  .action(function (repo) {
-     repository = repo;
-  });
+    .description('Validate commit messages and output all valid commmits to ' +
+    'stdout and invalid ones to stderr.\n\n' +
+    '  Examples:\n\n' +
+    '    # validate messages directly\n' +
+    '    node bin/validate \'Fix bug\' \'Change color\'\n' +
+    '\n' +
+    '    # validate last 5 commits (not including merge commits)\n' +
+    '    git log --oneline --all --no-merges -5 | node bin/validate stdin\n' +
+    '    git log --oneline --all --since="2 weeks ago" | node bin/validate stdin\n' +
+    '    # validate last 3 commits and show list of paths each commit modified\n' +
+    '    git log --oneline --all -3 | node bin/validate stdin -o \'--name-status\'\n' +
+    '    # validate all commits made by \'<Author>\' (regex)\n' +
+    '    git log --oneline --all --author=\'<Author>\' | node bin/validate stdin\n' +
+    '    # show only commits that have warnings (Unix only)\n' +
+    '    git log --oneline --all | node bin/validate stdin | grep -B 7 -A 2 \'^warning \'\n' +
+    '\n' +
+    '    # validate github repositories\n' +
+    '    node bin/validate github clns/node-commit-msg\n' +
+    '    node bin/validate github -t <https://github.com/settings/tokens> git/git\n' +
+    '    node bin/validate github -v -l 120 torvalds/linux\n' +
+    '    node bin/validate github -c test/resources/angular angular/angular.js')
+    .option('--no-colors', 'output without any colors')
+    .option('-c, --config [s]', 'the dir path to the package.json config to use', process.cwd());
+
+program
+    .command('* <message...>')
+    .description('Validate the given message(s)')
+    .action(validateMessages);
+
+program
+    .command('stdin')
+    .description('Validate commits read from stdin, one per line; each commit should be from the current directory\'s repository')
+    .option('-o, --log-options <options>', 'options to pass to `git-log`, usually for pretty printing', '')
+    .action(validateStdin);
+
+program
+    .command('github <repository>')
+    .description('Validate a remote repository from GitHub')
+    .option('-t, --token [s]', 'GitHub token; if not specified it will fetch anonymously')
+    .option('-l, --limit [n]', 'how many commits to process, default is 30', 30)
+    .option('-v, --verbose', 'display GitHub rate limit')
+    .action(validateGithub);
 
 program.parse(process.argv);
 
-if (!program.args.length || typeof repository === 'undefined') {
-    program.help();
+
+// Process commits, based on method
+
+function validateMessages(msgs) {
+    var validateMsg = function() {
+        var message = msgs.shift();
+        if (!message) return;
+        CommitMessage.parse(message, program.config, function(err, validator) {
+            if (err) {
+                console.error(err);
+                process.exit(1);
+            }
+            outputCommit(validator);
+            validateMsg(); // continue
+        });
+    }
+    validateMsg();
 }
 
-var totalCommits = 0;
-var validCommits = 0;
-var commitsWithWarn = 0;
-var processCommit = function(err, commit, cb) {
-    if (err) {
-        console.error(err.toString());
-        process.exit(1);
+function validateStdin() {
+    var command = this;
+    var rl = readline.createInterface({
+        input: process.stdin
+    });
+    var commits = [];
+    var started = false;
+    var validateSha = function() {
+        var sha = commits.shift();
+        if (!sha) return;
+
+        var cmd = util.format('git log --pretty=%B %s^!', sha);
+        var message;
+        var output;
+
+        try {
+            message = execSync(cmd, {
+                cwd: process.cwd(),
+                encoding: 'utf8',
+                stdio: [null]
+            });
+        } catch(e) {
+            console.error(e.toString());
+            console.error('Make sure the commit hash is found at the beginning of each line');
+            process.exit(1);
+        }
+
+        cmd = util.format('git log %s %s^!', command.logOptions, sha);
+        try {
+            output = execSync(cmd, {
+                cwd: process.cwd(),
+                encoding: 'utf8',
+                stdio: [null]
+            });
+        } catch(e) {
+            console.error(e.toString());
+            process.exit(1);
+        }
+
+        CommitMessage.parse(message, program.config, function(err, validator) {
+            if (err) {
+                console.error(err);
+                process.exit(1);
+            }
+            outputCommit(validator, output);
+            validateSha(); // continue
+        });
     }
 
-    CommitMessage.parse(commit, program.config, function(err, msg) {
-        if (err) {
-            console.log('Commit was:', program.noColors ? commit : chalk.cyan(commit));
-            throw e;
+    rl.on('line', function (line) {
+        commits.push(line.split(' ')[0]);
+        if (!started) {
+            validateSha();
+            started = true;
         }
-
-        totalCommits++;
-
-        if (!msg.hasErrors()) {
-            validCommits++;
-        }
-        if (msg.hasWarnings()) {
-            commitsWithWarn++;
-        }
-        var hasMessages = msg.hasErrors() || msg.hasWarnings();
-        var log = msg.hasErrors() ? console.error : console.log;
-        var logError = function(s) {
-            log(program.verbose || program.noColors ? s : chalk.red(s));
-        };
-        var logValid = function(s) {
-            log(program.noColors ? s : chalk.green(s));
-        };
-        var logCommit = msg.hasErrors() ? logError : logValid;
-
-        log('-------------------------------------------------------------------------------');
-        logCommit(commit);
-        if (hasMessages && program.verbose) {
-            log(msg.formattedMessages);
-        }
-        log('-------------------------------------------------------------------------------');
-
-        cb();
     });
 }
-var finish = function() {
-    if (program.verbose) {
-        console.log('Summary:');
-        console.log('- processed %d/%d (valid) commit(s)', validCommits, totalCommits);
-        console.log('- %d% success rate and %d% warnings',
-        totalCommits ? parseInt(validCommits / totalCommits * 100) : 0,
-        totalCommits ? parseInt(commitsWithWarn / totalCommits * 100) : 0);
-    }
-}
 
-GitHub(
-    { repo: repository, limit: program.limit, token: program.token },
-    processCommit
-);
-
-// GitHub client
-
-function GitHub(opts, cb) {
-    var path = util.format('/repos/%s/commits', opts.repo);
+function validateGithub(repository) {
+    var command = this;
+    var path = util.format('/repos/%s/commits', repository);
     var options = {
         hostname: 'api.github.com',
         path: path + '?page=1',
@@ -109,21 +151,22 @@ function GitHub(opts, cb) {
             'Accept': 'application/vnd.github.v3+json'
         }
     };
-    if (opts.token) {
-        options.headers.Authorization = 'token ' + opts.token;
+    if (command.token) {
+        options.headers.Authorization = 'token ' + command.token;
     }
-    var limit = opts.limit;
+    var limit = command.limit;
     var defaultLimit = 30;
     var ct = 0;
     var get = function() {
         https.get(options, function(res) {
-            if (res.headers && res.headers['x-ratelimit-remaining'] && program.verbose) {
+            if (program.verbose && res.headers && res.headers['x-ratelimit-remaining']) {
                 console.log('X-Ratelimit-Remaining: %d / %d',
                 res.headers['x-ratelimit-remaining'],
                 res.headers['x-ratelimit-limit']);
             }
             if (res.statusCode !== 200) {
-                return cb(new Error(res.statusMessage));
+                console.error('%d %s', res.statusCode, res.statusMessage);
+                process.exit(1);
             }
 
             var body = '';
@@ -136,22 +179,83 @@ function GitHub(opts, cb) {
                 ct += commits.length;
                 var more = !(ct >= limit || commits.length < defaultLimit);
                 var handleCommit = function() {
-                    var c = commits.shift();
-                    if (!c) {
-                        if (more) {
-                            options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1);
-                            get();
-                        } else {
-                            finish();
-                        }
-                        return;
+                    var d = commits.shift();
+                    if (d) {
+                        var output = util.format(
+                            'commit %s\n' +
+                            'Author: %s <%s>\n' +
+                            'Date:   %s\n\n' +
+                            '%s',
+                            d.sha,
+                            d.commit.author.name, d.commit.author.email,
+                            d.commit.author.date,
+                            d.commit.message.replace(/^/gm, '    ')
+                        );
+
+                        CommitMessage.parse(d.commit.message, program.config, function(err, validator) {
+                            if (err) {
+                                console.error(err);
+                                process.exit(1);
+                            }
+                            outputCommit(validator, output);
+                            handleCommit(); // continue
+                        });
+                    } else if (more) {
+                        options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1);
+                        get();
                     }
-                    cb(null, c.commit.message, handleCommit);
                 }
                 handleCommit();
             });
         });
-    }
+
+    } // end GitHub
 
     get();
 }
+
+
+// Output validation results
+
+var totalCommits = 0;
+var validCommits = 0;
+var commitsWithWarn = 0;
+
+// Output the given output (or validator.message if output not given)
+// to stdout or stderr, including the error messages.
+// Valid commits will be green.
+function outputCommit(validator, output) {
+    if (!output) {
+        output = validator.message;
+    }
+    totalCommits++;
+
+    if (!validator.hasErrors()) {
+        validCommits++;
+    }
+    if (validator.hasWarnings()) {
+        commitsWithWarn++;
+    }
+    var hasMessages = validator.hasErrors() || validator.hasWarnings();
+    var log = validator.hasErrors() ? console.error : console.log;
+    var logColor = function(o) {
+        if (!program.noColors && !validator.hasErrors()) {
+            o = chalk.green(o);
+        }
+        log(o);
+    }
+
+    logColor(output);
+    if (hasMessages) {
+        log(validator.formattedMessages);
+    }
+    log();
+}
+
+process.on('beforeExit', function() {
+    console.log('Summary:');
+    console.log('- %d/%d (valid) commit(s)', validCommits, totalCommits);
+    console.log('- %d% success rate and %d% warnings',
+        totalCommits ? parseInt(validCommits / totalCommits * 100) : 0,
+        totalCommits ? parseInt(commitsWithWarn / totalCommits * 100) : 0);
+});
