@@ -79,9 +79,8 @@ describe('nlp-parser', function() {
 
         var sentences = [
            'Add empty name check and changed email validation',
-           'CSS fixes for the profile page',
-           'Fixed bug in landing page',
-           'Bug fixes when building target'
+           'Fixes nasty bug on the registration page',
+           'Fixed bug in landing page'
         ];
         Parser.parseSentences(sentences, 'newline', function(err, instances) {
             if (err) return done(err);
@@ -89,8 +88,7 @@ describe('nlp-parser', function() {
             assert.equal(instances.length, sentences.length);
             assert.equal(instances[0]._wordsAndTags, wordsAndTags);
             assert.deepEqual(removeCircularRefs(instances[0]._penn), removeCircularRefs(pennParsed));
-            assert(!instances[1].hasVerb(), 'Sentence "' + instances[1]._wordsAndTags +
-            '" has hasVerb===true while should be false');
+            assert.equal(instances[1].penn.children[0].children[0].children[0].value, 'VBZ Fixes');
             assert(instances[2].hasVerb(), 'Sentence "' + instances[2]._wordsAndTags +
             '" has hasVerb===false while should be true');
             done();
