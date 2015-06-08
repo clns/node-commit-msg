@@ -53,6 +53,13 @@ var cases = [
         in: ['remove unused elementTransclusion'],
         errors: [new Error('Commit subject should be prefixed by a type',
             Error.ERROR, [1, 1])]
+    },
+    {
+        describe: 'invalid reference',
+        in: ['refactor($compile): remove unused elementTransclusion argument',
+            'Fixes #99999999'],
+        errors: [new Error('Reference #99999999 is not valid',
+            Error.ERROR, [3, 1])]
     }
 ];
 
