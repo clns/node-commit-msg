@@ -59,7 +59,8 @@ program
     .command('github <repository>')
     .description('Validate a remote repository from GitHub')
     .option('-t, --token [s]', 'GitHub token; if not specified it will fetch anonymously')
-    .option('-l, --limit [n]', 'how many commits to process, default is 30', 30)
+    .option('-l, --limit [n]', 'how many commits to process, default is 100', 100)
+    .option('-o, --offset [n]', 'the nth commit to start processing, default is 0', 0)
     .option('-v, --verbose', 'display GitHub rate limit')
     .action(validateGithub);
 
@@ -144,10 +145,16 @@ function validateStdin() {
 
 function validateGithub(repository) {
     var command = this;
+    var limit = command.limit;
+    var offset = command.offset;
+    var defaultLimit = 100; // get maximum number of records for efficiency
+    var ct = 0;
+    var page = parseInt(offset / defaultLimit);
+    var offset = offset - page * defaultLimit;
     var path = util.format('/repos/%s/commits', repository);
     var options = {
         hostname: 'api.github.com',
-        path: path + '?page=1',
+        path: path+'?page='+(page+1)+'&per_page='+defaultLimit,
         headers: {
             'User-Agent': 'clns/node-commit-msg',
             'Accept': 'application/vnd.github.v3+json'
@@ -156,12 +163,9 @@ function validateGithub(repository) {
     if (command.token) {
         options.headers.Authorization = 'token ' + command.token;
     }
-    var limit = command.limit;
-    var defaultLimit = 30;
-    var ct = 0;
     var get = function() {
         https.get(options, function(res) {
-            if (program.verbose && res.headers && res.headers['x-ratelimit-remaining']) {
+            if (command.verbose && res.headers && res.headers['x-ratelimit-limit']) {
                 console.log('X-Ratelimit-Remaining: %d / %d',
                 res.headers['x-ratelimit-remaining'],
                 res.headers['x-ratelimit-limit']);
@@ -177,7 +181,8 @@ function validateGithub(repository) {
             });
 
             res.on('end', function () {
-                var commits = JSON.parse(body).slice(0, limit-ct);
+                var commits = JSON.parse(body).slice(offset, limit-ct+offset);
+                offset = 0;
                 ct += commits.length;
                 var more = !(ct >= limit || commits.length < defaultLimit);
                 var handleCommit = function() {
@@ -203,7 +208,7 @@ function validateGithub(repository) {
                             handleCommit(); // continue
                         });
                     } else if (more) {
-                        options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1);
+                        options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1) + '&per_page=' + defaultLimit;
                         get();
                     }
                 }
@@ -256,8 +261,8 @@ function outputCommit(validator, output) {
 
 process.on('beforeExit', function() {
     console.log('Summary:');
-    console.log('- %d/%d (valid) commit(s)', validCommits, totalCommits);
+    console.log('- %d/%d valid/total (with warnings: %d)', validCommits, totalCommits, commitsWithWarn);
     console.log('- %d% success rate and %d% warnings',
-        totalCommits ? parseInt(validCommits / totalCommits * 100) : 0,
-        totalCommits ? parseInt(commitsWithWarn / totalCommits * 100) : 0);
+        totalCommits ? Math.ceil(validCommits / totalCommits * 100) : 0,
+        totalCommits ? Math.ceil(commitsWithWarn / totalCommits * 100) : 0);
 });
