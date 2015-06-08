@@ -102,7 +102,7 @@ function validateStdin() {
         var sha = commits.shift();
         if (!sha) return;
 
-        var cmd = util.format('git log --pretty=%B -1 %s^', sha);
+        var cmd = util.format('git log --pretty=%B -1 %s', sha);
         var message;
         var output;
 
@@ -118,7 +118,7 @@ function validateStdin() {
             process.exit(1);
         }
 
-        cmd = util.format('git log %s -1 %s^', command.logOptions, sha);
+        cmd = util.format('git log %s -1 %s', command.logOptions, sha);
         try {
             output = execSync(cmd, {
                 cwd: process.cwd(),
