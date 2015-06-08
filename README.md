@@ -45,7 +45,7 @@ or newer (required by the parser) (to check the current version run
 
 ### Install
 
-> The commands below should be run from your project's root
+The commands below should be run from your project's root
 directory (where `.git` is).
 
 > IMPORTANT: On Windows, make sure you run the commands below
@@ -62,7 +62,8 @@ To disable the auto-install check out [Configuration](#configuration).
 
 #### Update
 
-Just run the install command again.
+Just run the install command again or `npm update commit-msg` if you have
+a package.json file.
 
 #### Uninstall
 
@@ -73,11 +74,11 @@ npm uninstall commit-msg
 ## Configuration
 
 You can configure this module by specifying a `commitMsg` key in your
-`package.json` file. Possible configurations are:
+package.json file. Possible configurations are:
 
 - `noHook` (Boolean) Set to `true` to disable the git hook auto-install
 - [any key from the default `config` object](lib/config.js#L8)
-- see [disable validation](#disable-validation) to turn it off once installed
+- to turn it off once installed see [disable validation](#disable-validation)
 
 For [an example](test/resources/angular/package.json) check out
 [Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit)
@@ -88,6 +89,48 @@ config file.
 A first example is the [commit-msg](bin/commit-msg) hook. For another example
 you can check the [validate](bin/validate) script. For more usages
 check the [test files](test).
+
+### Manual validation
+
+The validator includes a script for validating messages
+directly from the command line. It is located at
+[bin/validate](bin/validate) and you can access it from anywhere using
+`node <path-to-bin/validate>`, eg:
+
+```sh
+# example acessing 'help' from your project root
+node node_modules/commit-msg/bin/validate -h
+```
+
+Examples below assume the module is installed at `node_modules/commit-msg`
+in your project root.
+
+##### A note on performance
+
+> To greatly improve the script speed make sure you have the
+[optional prerequisites](CONTRIBUTING.md#2-install-the-optional-prerequisites)
+installed.
+
+##### Validate any given message(s)
+
+```sh
+node node_modules/commit-msg/bin/validate 'Fix bug'
+```
+
+##### Validate all commits from the local repository
+
+```sh
+git log --oneline --all | node node_modules/commit-msg/bin/validate stdin
+```
+
+##### Validate last 10 commits made by &lt;Author&gt;
+
+```sh
+# don't forget to replace <Author>
+git log --oneline --all -10 --author='<Author>' | node node_modules/commit-msg/bin/validate stdin
+```
+
+For more examples see the script help.
 
 ### API
 
@@ -171,36 +214,6 @@ The "error" string.
 ##### `CommitMessage.Error.WARNING: string`
 
 The "warning" string.
-
-### Manual validation
-
-The validator includes a script for validating messages
-directly from the command line. It is located at
-`bin/validate` and you can access it from anywhere using:
-
-```sh
-node <path-to-bin/validate> -h
-
-# example from your project root
-node node_modules/commit-msg/bin/validate -h
-```
-
-##### Validate any given message
-
-```sh
-node node_modules/commit-msg/bin/validate 'Fix bug
-
-This is the first line of the commit body.'
-```
-
-##### Validate last 10 commits made by &lt;Author&gt;
-
-```sh
-# don't forget to replace <Author>
-git log --oneline --all -10 --author='<Author>' | node node_modules/commit-msg/bin/validate stdin
-```
-
-For more examples see the script help.
 
 ### Disable validation
 
