@@ -261,16 +261,16 @@ describe('CommitMessage', function() {
             var config = t.config || cfg;
 
             itFn(util.format('%s', t.describe), function(done) {
-                CommitMessage.parse(input, config, function(err, message) {
+                CommitMessage.parse(input, config, function(err, validator) {
                     if (err) return done(err);
 
-                    assert.deepEqual(message._errors, t.errors, failMsg);
-                    assert.equal(message.hasErrors(), expectErrors, failMsg);
-                    assert.equal(message.hasWarnings(), expectWarnings, failMsg);
+                    assert.deepEqual(validator._errors, t.errors, failMsg);
+                    assert.equal(validator.hasErrors(), expectErrors, failMsg);
+                    assert.equal(validator.hasWarnings(), expectWarnings, failMsg);
 
-                    if (!message.hasErrors() && !expectErrors) {
-                        assert.equal(message._title, t.in[0], failMsg);
-                        assert.equal(message._body, t.in[1], failMsg);
+                    if (!validator.hasErrors() && !expectErrors) {
+                        assert.equal(validator._title, t.in[0], failMsg);
+                        assert.equal(validator._body, t.in[1], failMsg);
                     }
 
                     done();
@@ -285,10 +285,10 @@ describe('CommitMessage', function() {
 
         imperativeCases.forEach(function(input) {
             it('should be valid: ' + input.msg, function(done) {
-                CommitMessage.parse(input.msg, function(err, message) {
+                CommitMessage.parse(input.msg, function(err, validator) {
                     if (err) return done(err);
 
-                    assert.deepEqual(message._errors, []);
+                    assert.deepEqual(validator._errors, []);
                     done();
                 });
             });
@@ -299,26 +299,26 @@ describe('CommitMessage', function() {
                 var error = new Error('Use imperative present tense, eg. "Fix bug" not ' +
                 '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
                 'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, input.location);
-                CommitMessage.parse(input.msg, function(err, message) {
+                CommitMessage.parse(input.msg, function(err, validator) {
                     if (err) return done(err);
 
-                    assert.deepEqual(message._errors, [error]);
+                    assert.deepEqual(validator._errors, [error]);
                     done();
                 });
             });
         });
-    }); // end non-imporative verbs
+    }); // end [non]imperative verbs
 
     describe('#parseFromFile', function() {
         var file = path.resolve(__dirname, 'resources/COMMIT_EDITMSG');
         var relativeFile = path.relative(path.resolve(__dirname, '..'), file);
 
         it('should parse correctly ' + relativeFile, function(done) {
-            CommitMessage.parseFromFile(file, function(err, message) {
+            CommitMessage.parseFromFile(file, function(err, validator) {
                 if (err) return done(err);
 
-                assert.deepEqual(message._errors, []);
-                assert.equal(message._title,
+                assert.deepEqual(validator._errors, []);
+                assert.equal(validator._title,
                     'Fix broken crypto_register_instance() module');
 
                 done();
@@ -326,11 +326,60 @@ describe('CommitMessage', function() {
         });
 
         it('should return error for non-existing file', function(done) {
-            CommitMessage.parseFromFile('non-existing-file', function(err, message) {
+            CommitMessage.parseFromFile('non-existing-file', function(err, validator) {
                 assert.equal(err.code, 'ENOENT');
                 done();
             });
         });
-    });
+    }); // end #parseFromFile
+
+    describe('special cases', function() {
+
+        it('should be disabled', function(done) {
+            CommitMessage.parse('Fixed bug.', {disable: true}, function(err, validator) {
+                assert.equal(validator.hasErrors(), false);
+                done();
+            });
+        });
+
+        it('should resolve config correctly', function(done) {
+            var angularConfig = path.resolve(__dirname, 'resources/angular');
+            var failMsg = 'Config at ' + angularConfig;
+            var cfg = CommitMessage.resolveConfigSync(angularConfig);
+            assert.equal(cfg.titlePreferredMaxLineLength, false, failMsg);
+            assert.equal(cfg.capitalized.capital, false, failMsg);
+
+            cfg = CommitMessage.resolveConfigSync(path.resolve(__dirname, '../..'));
+            assert.equal(cfg, false, 'No package.json found');
+
+            cfg = CommitMessage.resolveConfigSync(__dirname);
+            assert.equal(typeof cfg, 'undefined', 'Config at ' + __dirname);
+
+            CommitMessage.resolveConfig(__dirname, function(cfg) {
+                assert.equal(typeof cfg, 'undefined', 'Config at ' + __dirname);
+
+                CommitMessage.resolveConfig(path.resolve(__dirname, '../..'), function(cfg) {
+                    assert.equal(cfg, false, 'No package.json found');
+                    done();
+                });
+            });
+        });
+
+        it('should parse properties correctly', function(done) {
+            var input = '\n# This is an empty commit message\ndiff ...';
+            var failMsg = 'The message was:\n' + input;
+            CommitMessage.parse(input, function(err, validator) {
+                if (err) throw err;
+
+                assert.equal(validator.message, '', failMsg);
+                assert.equal(validator.formattedMessages, '', failMsg);
+                assert.equal(validator.hasErrors(), false, failMsg);
+                assert.equal(validator.hasWarnings(), false, failMsg);
+
+                done();
+            });
+        });
+
+    }); // end special cases
 
 }); // end CommitMessage
