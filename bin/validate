@@ -67,8 +67,11 @@ program
 
 program.parse(process.argv);
 
-var config = CommitMessage.resolveConfigSync(program.config);
-config = CommitMessage.Config(JSON.parse(program.extraConfig), CommitMessage.Config(config));
+function getConfig() {
+    var config = CommitMessage.resolveConfigSync(program.config);
+    return CommitMessage.Config(JSON.parse(program.extraConfig), CommitMessage.Config(config));
+}
+
 
 // Process commits, based on method
 
@@ -76,7 +79,7 @@ function validateMessages(msgs) {
     var validateMsg = function() {
         var message = msgs.shift();
         if (!message) return;
-        CommitMessage.parse(message, config, function(err, validator) {
+        CommitMessage.parse(message, getConfig(), function(err, validator) {
             if (err) {
                 console.error(err);
                 process.exit(1);
@@ -127,7 +130,7 @@ function validateStdin() {
             process.exit(1);
         }
 
-        CommitMessage.parse(message, config, function(err, validator) {
+        CommitMessage.parse(message, getConfig(), function(err, validator) {
             if (err) {
                 console.error(err);
                 process.exit(1);
@@ -148,6 +151,7 @@ function validateStdin() {
 
 function validateGithub(repository) {
     var command = this;
+    var config = getConfig();
     var limit = command.limit;
     var offset = command.offset;
     var defaultLimit = 100; // get maximum number of records for efficiency
@@ -165,6 +169,9 @@ function validateGithub(repository) {
     };
     if (command.token) {
         options.headers.Authorization = 'token ' + command.token;
+        if (config.references && config.references.github && !config.references.github.token) {
+            config.references.github.token = command.token;
+        }
     }
     var get = function() {
         https.get(options, function(res) {
