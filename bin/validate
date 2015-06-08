@@ -40,9 +40,10 @@ program
     '    node '+executable+' github clns/node-commit-msg\n' +
     '    node '+executable+' github -t <https://github.com/settings/tokens> git/git\n' +
     '    node '+executable+' github -v -l 120 torvalds/linux\n' +
-    '    node '+executable+' github -c test/resources/angular angular/angular.js')
+    '    node '+executable+' github -c test/resources/angular --extra-config \'{"references": {"alwaysCheck": "never"}}\' angular/angular.js')
     .option('--no-colors', 'output without any colors')
-    .option('-c, --config [s]', 'the dir path to the package.json config to use', process.cwd());
+    .option('-c, --config [s]', 'the dir path to the package.json config to use', process.cwd())
+    .option('--extra-config [o]', 'extra config object (as json) to overwrite the existing config', '{}');
 
 program
     .command('* <message...>')
@@ -66,6 +67,8 @@ program
 
 program.parse(process.argv);
 
+var config = CommitMessage.resolveConfigSync(program.config);
+config = CommitMessage.Config(JSON.parse(program.extraConfig), CommitMessage.Config(config));
 
 // Process commits, based on method
 
@@ -73,7 +76,7 @@ function validateMessages(msgs) {
     var validateMsg = function() {
         var message = msgs.shift();
         if (!message) return;
-        CommitMessage.parse(message, program.config, function(err, validator) {
+        CommitMessage.parse(message, config, function(err, validator) {
             if (err) {
                 console.error(err);
                 process.exit(1);
@@ -124,7 +127,7 @@ function validateStdin() {
             process.exit(1);
         }
 
-        CommitMessage.parse(message, program.config, function(err, validator) {
+        CommitMessage.parse(message, config, function(err, validator) {
             if (err) {
                 console.error(err);
                 process.exit(1);
@@ -199,7 +202,7 @@ function validateGithub(repository) {
                             d.commit.message.replace(/^/gm, '    ')
                         );
 
-                        CommitMessage.parse(d.commit.message, program.config, function(err, validator) {
+                        CommitMessage.parse(d.commit.message, config, function(err, validator) {
                             if (err) {
                                 console.error(err);
                                 process.exit(1);
