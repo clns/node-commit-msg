@@ -120,14 +120,14 @@ node node_modules/commit-msg/bin/validate 'Fix bug'
 ##### Validate all commits from the local repository
 
 ```sh
-git log --oneline --all | node node_modules/commit-msg/bin/validate stdin
+git log --oneline --all --no-merges | node node_modules/commit-msg/bin/validate stdin
 ```
 
 ##### Validate last 10 commits made by &lt;Author&gt;
 
 ```sh
 # don't forget to replace <Author>
-git log --oneline --all -10 --author='<Author>' | node node_modules/commit-msg/bin/validate stdin
+git log --oneline --all --no-merges -10 --author='<Author>' | node node_modules/commit-msg/bin/validate stdin
 ```
 
 For more examples see the script help.
