@@ -1,7 +1,24 @@
 # How to contribute
 
-Make sure you're familiar with GitHub's [Contributing to a Project](https://guides.github.com/activities/contributing-to-open-source/#contributing)
-guide.
+There are 2 ways you can contribute to this project:
+
+1. [Create issues](#create-an-issue)
+2. [Submit pull requests](#getting-started)
+
+>In both cases **make sure you're familiar with GitHub's [Contributing to a Project](https://guides.github.com/activities/contributing-to-open-source/#contributing)
+guide.**
+
+## Create an Issue
+
+It's possible you'll encounter verb tenses that don't validate correctly.
+For example a past tense sentence might pass validation, or a correct
+imperative message might not validate in some cases.
+
+The good news is these can be corrected by training the parser. The only thing
+you need to do is [create an issue](https://github.com/clns/node-commit-msg/issues?utf8=✓&q=is%3Aissue)
+with the message, but **only if there isn't
+already an issue that refer to improper tense validation** (re-open the issue
+if it's closed).
 
 ## Getting Started
 
@@ -11,6 +28,9 @@ guide.
 git clone https://github.com/clns/node-commit-msg
 cd node-commit-msg
 ```
+
+> Or maybe you want to fork it first and clone it from your location so you
+can send in pull requests.
 
 ##### 2. Install the optional prerequisites
 
@@ -41,6 +61,15 @@ npm install
 ```sh
 npm test
 ```
+
+### Troubleshooting
+
+##### This application requires the legacy Java SE 6 runtime which is unavailable for this version of OS X.
+
+If you encounter this runtime issue when calling java from node.js,
+especially if you're on OS X 10.11 El Capitan, see
+[this issue](https://github.com/joeferner/node-java/issues/223#issuecomment-110408072)
+for a fix.
 
 ## Commit Message
 
