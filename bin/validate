@@ -76,8 +76,9 @@ function getConfig() {
 // Process commits, based on method
 
 function validateMessages(msgs) {
+    var message;
     var validateMsg = function() {
-        var message = msgs.shift();
+        message = msgs.shift();
         if (!message) return;
         CommitMessage.parse(message, getConfig(), function(err, validator) {
             if (err) {
@@ -98,13 +99,12 @@ function validateStdin() {
     });
     var commits = [];
     var started = false;
+    var sha, cmd, message, output;
     var validateSha = function() {
-        var sha = commits.shift();
+        sha = commits.shift();
         if (!sha) return;
 
-        var cmd = util.format('git log --pretty=%B -1 %s', sha);
-        var message;
-        var output;
+        cmd = util.format('git log --pretty=%B -1 %s', sha);
 
         try {
             message = execSync(cmd, {
@@ -173,6 +173,35 @@ function validateGithub(repository) {
             config.references.github.token = command.token;
         }
     }
+    var body, commits, more, d, output;
+    var handleCommit = function() {
+        d = commits.shift();
+        if (d) {
+            output = util.format(
+                'commit %s\n' +
+                'Author: %s <%s>\n' +
+                'Date:   %s\n\n' +
+                '%s',
+                d.sha,
+                d.commit.author.name, d.commit.author.email,
+                d.commit.author.date,
+                d.commit.message.replace(/^/gm, '    ')
+            );
+
+            CommitMessage.parse(d.commit.message, config, function(err, validator) {
+                if (err) {
+                    console.error(err);
+                    process.exit(1);
+                }
+                outputCommit(validator, output);
+                validator = null;
+                handleCommit(); // continue
+            });
+        } else if (more) {
+            options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1) + '&per_page=' + defaultLimit;
+            get();
+        }
+    };
     var get = function() {
         https.get(options, function(res) {
             if (command.verbose && res.headers && res.headers['x-ratelimit-limit']) {
@@ -185,43 +214,16 @@ function validateGithub(repository) {
                 process.exit(1);
             }
 
-            var body = '';
+            body = '';
             res.on('data', function(chunk) {
                 body += chunk.toString();
             });
 
             res.on('end', function () {
-                var commits = JSON.parse(body).slice(offset, limit-ct+offset);
+                commits = JSON.parse(body).slice(offset, limit-ct+offset);
                 offset = 0;
                 ct += commits.length;
-                var more = !(ct >= limit || commits.length < defaultLimit);
-                var handleCommit = function() {
-                    var d = commits.shift();
-                    if (d) {
-                        var output = util.format(
-                            'commit %s\n' +
-                            'Author: %s <%s>\n' +
-                            'Date:   %s\n\n' +
-                            '%s',
-                            d.sha,
-                            d.commit.author.name, d.commit.author.email,
-                            d.commit.author.date,
-                            d.commit.message.replace(/^/gm, '    ')
-                        );
-
-                        CommitMessage.parse(d.commit.message, config, function(err, validator) {
-                            if (err) {
-                                console.error(err);
-                                process.exit(1);
-                            }
-                            outputCommit(validator, output);
-                            handleCommit(); // continue
-                        });
-                    } else if (more) {
-                        options.path = path + '?page=' + (Math.ceil(ct / defaultLimit)+1) + '&per_page=' + defaultLimit;
-                        get();
-                    }
-                }
+                more = !(ct >= limit || commits.length < defaultLimit);
                 handleCommit();
             });
         });
