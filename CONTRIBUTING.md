@@ -119,7 +119,7 @@ https://help.github.com/articles/closing-issues-via-commit-messages/).
 - Use the present tense ("Add feature" not "Added feature").
 - Use the imperative mode ("Move cursor to..." not "Moves cursor to...").
 - Limit the first line to [50 characters or less](http://stopwritingramblingcommitmessages.com/).
-- Always leave the second line blank (if there's more than just the title).
+- Always leave the second line blank (if there's more than just the subject).
 - Line break the commit message (to make the commit message readable without
 having to scroll horizontally).
 - Reference issues and pull requests liberally.

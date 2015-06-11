@@ -87,7 +87,7 @@ describe('angular guidelines', function() {
                     assert.equal(message.hasWarnings(), expectWarnings, failMsg);
 
                     if (!message.hasErrors() && !expectErrors) {
-                        assert.equal(message._title, t.in[0], failMsg);
+                        assert.equal(message._subject, t.in[0], failMsg);
                         assert.equal(message._body, t.in[1], failMsg);
                     }
 
