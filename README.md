@@ -13,7 +13,7 @@ and/or directly through the API.
 - Subject has a soft and hard limit for max length (50 and 70)
 (*warning* and *error* | *configurable*)
 - No consecutive whitespaces allowed in subject (*error*)
-- Subject should not end with a period or whitespace (*error*)
+- Subject should not end with a period (*error*)
 - Only [certain special characters](lib/config.js#L19) are allowed
 in the subject (*error* | *configurable*)
 - Subject can be prefixed with certain [type: component: ](lib/config.js#L29)
