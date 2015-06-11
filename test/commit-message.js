@@ -8,7 +8,7 @@ var Config = require('../lib/config');
 var Error = require('../lib/error');
 
 var cfg = Config({
-    imperativeVerbsInTitle: {
+    imperativeVerbsInSubject: {
         alwaysCheck: true
     },
     references: {
@@ -27,17 +27,17 @@ var cases = [
     },
     {
         describe: 'special characters',
-        in: ['Special chars: ./`,()[]\'"_3-~*$={}&;#+'],
+        in: ['Special chars: ./`,()[]\'"_3-~*$={}&;#+@<>%^'],
         errors: []
     },
     {
-        describe: 'title and body',
+        describe: 'subject and body',
         in: ['Test commit with body',
         'This is a commit body to explain the changes.'],
         errors: []
     },
     {
-        describe: 'title and lengthy body',
+        describe: 'subject and lengthy body',
         in: ['Test commit with lengthy body',
         'This is the first paragraph\n' +
         'of the body. More paragraphs following.' +
@@ -99,6 +99,12 @@ var cases = [
         errors: []
     },
     {
+        describe: 'commit subject ending in lots of whitespaces',
+        raw: 'Add commit message ending in lots of spaces                              \t ',
+        in: ['Add commit message ending in lots of spaces'],
+        errors: []
+    },
+    {
         describe: 'body starting with newline',
         in: ['Correct subject',
         '\nBody starting with newline'],
@@ -107,16 +113,16 @@ var cases = [
         Error.ERROR)]
     },
     {
-        describe: 'exceeding title length soft limit',
-        in: ['Add commit that exceeds the soft limit title imposed by the config'],
+        describe: 'exceeding subject length soft limit',
+        in: ['Add commit that exceeds the soft limit subject imposed by the config'],
         errors: [new Error(util.format('Commit subject should not exceed %d characters',
-        cfg.titlePreferredMaxLineLength.length), Error.WARNING, [1, cfg.titlePreferredMaxLineLength.length])]
+        cfg.subjectPreferredMaxLineLength.length), Error.WARNING, [1, cfg.subjectPreferredMaxLineLength.length])]
     },
     {
-        describe: 'exceeding title length hard limit',
-        in: ['Add commit that exceeds the title length hard limit imposed by the configuration'],
+        describe: 'exceeding subject length hard limit',
+        in: ['Add commit that exceeds the subject length hard limit imposed by the configuration'],
         errors: [new Error(util.format('Commit subject should not exceed %d characters',
-        cfg.titleMaxLineLength.length), Error.ERROR, [1, cfg.titleMaxLineLength.length])]
+        cfg.subjectMaxLineLength.length), Error.ERROR, [1, cfg.subjectMaxLineLength.length])]
     },
     {
         describe: 'starting with a lowercase letter',
@@ -127,12 +133,12 @@ var cases = [
     {
         describe: 'ending with a period',
         in: ['Add commit message ending with a period.'],
-        errors: [new Error('Commit subject should not end with a period or whitespace',
+        errors: [new Error('Commit subject should not end with a period',
         Error.ERROR, [1, 40])]
     },
     {
         describe: 'invalid characters',
-        in: ['Commit message with <invalid> chars'],
+        in: ['Commit message with §invalid chars'],
         errors: [new Error('Commit subject contains invalid characters',
         Error.ERROR, [1, 21])]
     },
@@ -176,7 +182,7 @@ var cases = [
         Error.ERROR, [1, 12])]
     },
     {
-        describe: 'misplaced issue reference (in title)',
+        describe: 'misplaced issue reference (in subject)',
         in: ['Commit fixes #12'],
         errors: [new Error('References should be placed in the last paragraph of the body',
         Error.ERROR, [1, 8])]
@@ -198,7 +204,7 @@ var cases = [
         Error.ERROR, [3, 1])]
     },
     {
-        describe: 'invalid type in commit title with past tense',
+        describe: 'invalid type in commit subject with past tense',
         in: ['l10n: Updated German translation of git (20t,0u)'],
         errors: [new Error('Commit subject contains invalid type l10n:', Error.ERROR, [1, 1]),
         new Error('Use imperative present tense, eg. "Fix bug" not ' +
@@ -211,7 +217,7 @@ var cases = [
         errors: [new Error('Commit subject should be prefixed by a type',
             Error.ERROR, [1, 1])],
         config: Config({
-            imperativeVerbsInTitle: {
+            imperativeVerbsInSubject: {
                 alwaysCheck: true
             },
             types: {required: true}
@@ -221,15 +227,29 @@ var cases = [
         describe: 'invalid issue reference should not be validated against the API',
         in: ['Invalid issue ref should not validate with API.',
         'Fixes github/hub#123456789'],
-        errors: [new Error('Commit subject should not end with a period or whitespace',
+        errors: [new Error('Commit subject should not end with a period',
         Error.ERROR, [1, 47])]
+    },
+    {
+        describe: 'subject starting with a space',
+        in: [' Add invalid commit starting with a space'],
+        errors: [new Error('Commit message should start with a capitalized letter',
+            Error.ERROR, [1, 1])]
     }
 ];
 
 var imperativeCases = [
+    {msg: 'Merge branch \'master\' into feature-1'},
+    {msg: 'Merge remote-tracking branch \'origin/master\''},
+    {msg: 'Merge pull request #3 from github/hub'},
     {msg: 'Add install atom script for OS X'},
-    // Thinks it's not in imperative mood
-    {msg: 'Don\'t create delta for .bz2 files'}
+    {msg: 'Don\'t create delta for .bz2 files'},
+    {msg: 'Remove disabled features'},
+    {msg: 'Don\'t append number to \'$\' when encoding URI'},
+    {msg: 'Remove useless and expired test'},
+    {msg: 'Format numbers and currency using pattern'},
+    {msg: 'Minor fixes regarding params serializers'}, // should pass 'FRAG' sentences
+    {msg: 'CSS fixes'}
 ];
 
 var nonImperativeCases = [
@@ -241,10 +261,13 @@ var nonImperativeCases = [
     {msg: 'Manually merged changes into master', location: [1, 10]},
     {msg: 'Sending the old record to the gateway', location: [1, 1]},
     {msg: 'Included new library', location: [1, 1]},
-    // It's not detected correctly as past tense because of
-    // the <type>: prefix which confuses the parser
-    {msg: 'docs: Updated Bulgarian translation', location: [1, 7]}
-    // {msg: 'Disabled password validation', location: [1, 1]}
+    {msg: 'docs: Updated Bulgarian translation', location: [1, 7]},
+    {msg: 'Fixes bug', location: [1, 1]},
+    {msg: 'Fixed bug', location: [1, 1]},
+    {msg: 'Added fixes', location: [1, 1]},
+    {msg: 'Disabled password validation', location: [1, 1]},
+    {msg: 'Merged branch \'develop\' into master', location: [1, 1]},
+    {msg: 'Merged changes into master branch', location: [1, 1]}
 ];
 
 describe('CommitMessage', function() {
@@ -269,7 +292,7 @@ describe('CommitMessage', function() {
                     assert.equal(validator.hasWarnings(), expectWarnings, failMsg);
 
                     if (!validator.hasErrors() && !expectErrors) {
-                        assert.equal(validator._title, t.in[0], failMsg);
+                        assert.equal(validator._subject, t.in[0], failMsg);
                         assert.equal(validator._body, t.in[1], failMsg);
                     }
 
@@ -318,7 +341,7 @@ describe('CommitMessage', function() {
                 if (err) return done(err);
 
                 assert.deepEqual(validator._errors, []);
-                assert.equal(validator._title,
+                assert.equal(validator._subject,
                     'Fix broken crypto_register_instance() module');
 
                 done();
@@ -346,7 +369,7 @@ describe('CommitMessage', function() {
             var angularConfig = path.resolve(__dirname, 'resources/angular');
             var failMsg = 'Config at ' + angularConfig;
             var cfg = CommitMessage.resolveConfigSync(angularConfig);
-            assert.equal(cfg.titlePreferredMaxLineLength, false, failMsg);
+            assert.equal(cfg.subjectPreferredMaxLineLength, false, failMsg);
             assert.equal(cfg.capitalized.capital, false, failMsg);
 
             cfg = CommitMessage.resolveConfigSync(path.resolve(__dirname, '../..'));
@@ -371,7 +394,7 @@ describe('CommitMessage', function() {
             CommitMessage.parse(input, function(err, validator) {
                 if (err) throw err;
 
-                assert.equal(validator.message, '', failMsg);
+                assert.equal(validator.message, '\n', failMsg);
                 assert.equal(validator.formattedMessages, '', failMsg);
                 assert.equal(validator.hasErrors(), false, failMsg);
                 assert.equal(validator.hasWarnings(), false, failMsg);
