@@ -149,7 +149,7 @@ var cases = [
 'commit body with very long lines that exceed the 72 characters limit imposed\n' +
 'by git commit message best practices. These practices include the linux kernel\n' +
 'and the git source.'],
-        errors: [new Error(util.format('Lines 1, 2 in the commit body are ' +
+        errors: [new Error(util.format('Line(s) 1, 2 in the commit body are ' +
         'longer than %d characters. Body lines should ' +
         'not exceed %d characters, except for compiler error ' +
         'messages or other "non-prose" explanation',
