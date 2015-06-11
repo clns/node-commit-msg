@@ -305,10 +305,13 @@ describe('CommitMessage', function() {
 
     describe('[non]imperative verbs', function() {
         this.timeout(20000); // allow enough time
+        var cfg = Config({
+            references: false
+        });
 
         imperativeCases.forEach(function(input) {
             it('should be valid: ' + input.msg, function(done) {
-                CommitMessage.parse(input.msg, function(err, validator) {
+                CommitMessage.parse(input.msg, cfg, function(err, validator) {
                     if (err) return done(err);
 
                     assert.deepEqual(validator._errors, []);
@@ -322,7 +325,7 @@ describe('CommitMessage', function() {
                 var error = new Error('Use imperative present tense, eg. "Fix bug" not ' +
                 '"Fixed bug" or "Fixes bug". To get it right ask yourself: "If applied, ' +
                 'this patch will <YOUR-COMMIT-MESSAGE-HERE>"', Error.ERROR, input.location);
-                CommitMessage.parse(input.msg, function(err, validator) {
+                CommitMessage.parse(input.msg, cfg, function(err, validator) {
                     if (err) return done(err);
 
                     assert.deepEqual(validator._errors, [error]);
