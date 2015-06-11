@@ -62,6 +62,7 @@ var cases = [
     },
     {
         describe: 'valid issue reference',
+        raw: 'Commit with issue ref\n\nFixes github/hub#1\n\n',
         in: ['Commit with issue ref',
         'Fixes github/hub#1'],
         errors: []
