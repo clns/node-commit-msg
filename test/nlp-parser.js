@@ -80,8 +80,19 @@ describe('nlp-parser', function() {
         var sentences = [
            'Add empty name check and changed email validation',
            'Fixes nasty bug on the registration page',
-           'Fixed bug in landing page'
+           'Fixed bug in landing page',
+           'Minor fixes regarding serializers'
         ];
+        var fragArr = [
+            '(ROOT',
+            '  (FRAG',
+            '    (NP (JJ Minor) (NNS fixes))',
+            '    (PP (VBG regarding)',
+            '      (NP (NNS serializers)))))'
+            ];
+        var fragParser = new Parser();
+        fragParser.penn = fragArr.join('\n');
+
         Parser.parseSentences(sentences, 'newline', function(err, instances) {
             if (err) return done(err);
 
@@ -91,6 +102,9 @@ describe('nlp-parser', function() {
             assert.equal(instances[1].penn.children[0].children[0].children[0].value, 'VBZ Fixes');
             assert(instances[2].hasVerb(), 'Sentence "' + instances[2]._wordsAndTags +
             '" has hasVerb===false while should be true');
+            assert.notEqual(instances[2].isFragment(), true);
+            assert(instances[3].isFragment());
+            assert.deepEqual(removeCircularRefs(instances[3].penn), removeCircularRefs(fragParser.penn));
             done();
         });
     });
