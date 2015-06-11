@@ -1,6 +1,7 @@
 {
   "description": "This is a sample config based on angular's git commit guidelines https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit",
   "commitMsg": {
+    "invalidCharsInSubject": false,
     "types": {
       "allowedTypes": "^(feat|fix|docs|style|refactor|perf|test|chore)(\\([^)]+\\))?: ",
       "required": true
@@ -11,8 +12,8 @@
     "capitalized": {
       "capital": false
     },
-    "titlePreferredMaxLineLength": false,
-    "titleMaxLineLength": {
+    "subjectPreferredMaxLineLength": false,
+    "subjectMaxLineLength": {
       "length": 100
     },
     "bodyMaxLineLength": {
