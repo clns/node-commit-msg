@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Git commit-msg hook using best practices",
   "main": "./lib/commit-message.js",
+  "bin": "./bin/validate",
   "scripts": {
     "hook": "node lib/setup",
     "hook-uninstall": "node lib/setup uninstall",
