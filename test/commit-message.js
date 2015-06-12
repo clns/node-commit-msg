@@ -75,7 +75,8 @@ var cases = [
         '# Please enter the commit message for your changes. Lines starting\n' +
         '# with \'#\' will be ignored, and an empty message aborts the commit.\n' +
         '# On branch master\n' +
-        '# Everything below this line will be ignored.\n\n' +
+        '# ------------------------ >8 ------------------------\n' +
+        '# Everything below will be removed.\n\n' +
         'diff ...',
         in: ['Amend commit',
         '- Fix something\n' +
@@ -94,8 +95,10 @@ var cases = [
     },
     {
         describe: 'empty commit message with comments',
-        raw: '\n\n#This is an empty commit message.\nEverything below ' +
-        'this line will be ignored.\n\ndiff ...',
+        raw: '\n\n# This is an empty commit message.\n' +
+        '# ------------------------ >8 ------------------------\n' +
+        '# Everything below will be removed.\n' +
+        'diff ...',
         in: [''],
         errors: []
     },
@@ -103,6 +106,48 @@ var cases = [
         describe: 'commit subject ending in lots of whitespaces',
         raw: 'Add commit message ending in lots of spaces                              \t ',
         in: ['Add commit message ending in lots of spaces'],
+        errors: []
+    },
+    {
+        describe: 'commit with \'squash!\'',
+        in: ['squash! chore: Rename variable \'title\' to \'subject\''],
+        errors: []
+    },
+    {
+        describe: 'don\'t validate this squash! commit',
+        in: ['squash! invalid commit that shouldn\'t validate'],
+        errors: [],
+        config: Config({squashFixup: {validateSquash: false}}, cfg)
+    },
+    {
+        describe: 'commit with \'fixup!\'',
+        in: ['fixup! not important commit message'],
+        errors: []
+    },
+    {
+        describe: 'rebase squash!',
+        raw: '# This is a combination of 3 commits.\n' +
+            '# The first commit\'s message is:\n' +
+            'Add squash test\n' +
+            '\n' +
+            '# This is the 2nd commit message:\n' +
+            '\n' +
+            'squash! Add squash test\n' +
+            '\n' +
+            'Add nonsense1\n' +
+            '\n' +
+            '# This is the 3rd commit message:\n' +
+            '\n' +
+            'squash! Add squash test\n' +
+            '\n' +
+            '# Please enter the commit message for your changes. Lines starting\n' +
+            '# with \'#\' will be ignored, and an empty message aborts the commit.\n' +
+            '# rebase in progress; onto f331e47\n' +
+            '#',
+        in: ['Add squash test',
+            'squash! Add squash test\n\n'+
+            'Add nonsense1\n\n'+
+            'squash! Add squash test'],
         errors: []
     },
     {
@@ -236,6 +281,18 @@ var cases = [
         in: [' Add invalid commit starting with a space'],
         errors: [new Error('Commit message should start with a capitalized letter',
             Error.ERROR, [1, 1])]
+    },
+    {
+        describe: 'don\'t allow squash! commits',
+        in: ['squash! Add commit that will be squashed'],
+        errors: [new Error('squash! commits are not allowed', Error.ERROR, [1, 1])],
+        config: Config({squashFixup: {allow: false}}, cfg)
+    },
+    {
+        describe: 'don\'t allow fixup! commits',
+        in: ['fixup! add commit that will be fixup\'ed'],
+        errors: [new Error('fixup! commits are not allowed', Error.ERROR, [1, 1])],
+        config: Config({squashFixup: {allow: false}}, cfg)
     }
 ];
 
@@ -393,12 +450,12 @@ describe('CommitMessage', function() {
         });
 
         it('should parse properties correctly', function(done) {
-            var input = '\n# This is an empty commit message\ndiff ...';
+            var input = '\n# This is an empty commit message\n';
             var failMsg = 'The message was:\n' + input;
             CommitMessage.parse(input, function(err, validator) {
                 if (err) throw err;
 
-                assert.equal(validator.message, '\n', failMsg);
+                assert.equal(validator.message, input, failMsg);
                 assert.equal(validator.formattedMessages, '', failMsg);
                 assert.equal(validator.hasErrors(), false, failMsg);
                 assert.equal(validator.hasWarnings(), false, failMsg);
