@@ -2,8 +2,8 @@
 
 commit-msg is a customizable git commit message parser and validator
 written in Node.js. It validates a given string based on
-[best practices](CONTRIBUTING.md#commit-message) and can be used as a git hook
-and/or directly through the API.
+[best practices](GUIDELINES.md) and can be used as a git hook,
+command line tool and/or directly through the API.
 
 ### Default validations
 
@@ -29,19 +29,21 @@ instead of "Fix bug" (*error* | *configurable*)
 
 > Only use it if you agree with the guidelines it follows and
 if the customization it offers is enough to meet your needs. I will not accept
-changes that do not adhere to the basic rules outlined in the
-[best practices](CONTRIBUTING.md#commit-message) document, unless they come
+changes that do not adhere to the general rules outlined in the
+[guidelines](GUIDELINES.md) document, unless they come
 with very compelling reasons.
 
 ## Installation
 
+> Note: This module is currently in active development and a stable v1.0.0
+will be released in a few weeks. Until then, issues will be disabled and
+things might change. For any questions contact me directly.
+
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 0.12 or newer (to check the current version
-run `node -v` in a cli)
+- [Node.js](https://nodejs.org/) 0.12 or newer
 - [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-or newer (required by the parser) (to check the current version run
-`java -version` in a cli)
+or newer (required by the parser)
 
 ### Install
 
@@ -53,12 +55,17 @@ using *administrator* rights.
 Eg. open PowerShell using *Run as administrator*.
 
 ```sh
-npm install https://github.com/clns/node-commit-msg --save-dev
+npm install commit-msg --save-dev
 ```
 
 This will also install (symlink) the [commit-msg](bin/commit-msg) hook
 in your project's `.git/hooks/` directory so you are ready to start committing.
 To disable the auto-install check out [Configuration](#configuration).
+
+##### Global install
+
+You can also install it globally using `npm install commit-msg -g` in which
+case you can use the command line validator as `commit-msg -h`.
 
 #### Update
 
