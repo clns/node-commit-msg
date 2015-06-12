@@ -17,12 +17,12 @@ and/or directly through the API.
 - Only [certain special characters](lib/config.js#L19) are allowed
 in the subject (*error* | *configurable*)
 - Subject can be prefixed with certain [type: component: ](lib/config.js#L29)
-and [invalid types](lib/config.js#L36) can de detected
+and [invalid types](lib/config.js#L36) can de detected (*error* | *configurable*)
 - [GitHub issue references](https://help.github.com/articles/closing-issues-via-commit-messages/)
 should be placed in the last paragraph of the body and they should
 exist on GitHub (*error* | *configurable*)
-- Detection of non-imperative verbs in subject, eg. "Fix bug" not "Fixes bug" or
-"Fixed bug" (*error* | *configurable*)
+- Detection of non-imperative verbs in subject, eg. "Fixes bug" or "Fixed bug"
+instead of "Fix bug" (*error* | *configurable*)
 - Body lines should be wrapped at 72 characters (*warning* | *configurable*)
 
 ### Disclaimer
