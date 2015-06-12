@@ -62,6 +62,22 @@ npm install
 npm test
 ```
 
+If you run out of
+[GitHub anonymous requests](https://developer.github.com/v3/#rate-limiting)
+when running the tests (you see messages like "*warning: GitHub
+reference check failed with status code 403 ...*") you can provide a
+[personal access token](https://github.com/settings/tokens) like this:
+
+```sh
+GITHUB_TOKEN=<token> npm test
+```
+
+or in PowerShell:
+
+```PowerShell
+$env:GITHUB_TOKEN='<token>'; npm test
+```
+
 ### Troubleshooting
 
 ##### This application requires the legacy Java SE 6 runtime which is unavailable for this version of OS X.
