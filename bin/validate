@@ -25,7 +25,10 @@ program
     '  Examples:\n\n' +
     '    # validate messages directly\n' +
     '    node '+executable+' \'Fix bug\' \'Change color\'\n' +
-    '\n' +
+    '    \n' +
+    '    # validate from given file\n' +
+    '    node '+executable+' file .git/COMMIT_EDITMSG\n' +
+    '    \n' +
     '    # validate last 5 commits (not including merge commits)\n' +
     '    git log --oneline --all --no-merges -5 | node '+executable+' stdin\n' +
     '    git log --oneline --all --since="2 weeks ago" | node '+executable+' stdin\n' +
@@ -35,7 +38,7 @@ program
     '    git log --oneline --all --author=\'<Author>\' | node '+executable+' stdin\n' +
     '    # show only commits that have warnings (Unix only)\n' +
     '    git log --oneline --all | node '+executable+' stdin | grep -B 7 -A 2 \'^warning \'\n' +
-    '\n' +
+    '    \n' +
     '    # validate github repositories\n' +
     '    node '+executable+' github clns/node-commit-msg\n' +
     '    node '+executable+' github -t <https://github.com/settings/tokens> git/git\n' +
@@ -49,6 +52,11 @@ program
     .command('* <message...>')
     .description('Validate the given message(s)')
     .action(validateMessages);
+
+program
+    .command('file <file...>')
+    .description('Validate the message(s) read from file(s)')
+    .action(validateFile);
 
 program
     .command('stdin')
@@ -90,6 +98,14 @@ function validateMessages(msgs) {
         });
     }
     validateMsg();
+}
+
+function validateFile(files) {
+    var msgs = [];
+    files.forEach(function(f) {
+        msgs.push(fs.readFileSync(f, {'encoding': 'utf8'}));
+    });
+    validateMessages(msgs);
 }
 
 function validateStdin() {
