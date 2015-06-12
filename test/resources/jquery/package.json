@@ -1,0 +1,26 @@
+{
+  "description": "This is a sample config based on jquery's commit guidelines http://contribute.jquery.org/commits-and-pull-requests/#commit-guidelines",
+  "commitMsg": {
+    "types": {
+      "allowedTypes": "^[A-Z][\\w-]*: ",
+      "required": true
+    },
+    "strictTypes": false,
+    "capitalized": false,
+    "subjectPreferredMaxLineLength": false,
+    "subjectMaxLineLength": {
+      "length": 72
+    },
+    "bodyMaxLineLength": {
+      "length": 80,
+      "type": "error"
+    },
+    "references": {
+      "github": {
+        "user": "jquery",
+        "repo": "jquery"
+      }
+    },
+    "imperativeVerbsInSubject": false
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "description": "This is a sample config based on GNOME's Guidelines for Commit Messages https://wiki.gnome.org/Git/CommitMessages",
+  "commitMsg": {
+    "types": {
+      "allowedTypes": "^[\\w.-/]+: "
+    },
+    "strictTypes": false,
+    "subjectMaxLineLength": {
+      "length": 72
+    },
+    "bodyMaxLineLength": {
+      "length": 72
+    },
+    "references": false
+  }
+}

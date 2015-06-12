@@ -1,0 +1,18 @@
+{
+  "description": "This is a sample config based on Gerrit's commit message guidelines http://www.mediawiki.org/wiki/Gerrit/Commit_message_guidelines",
+  "commitMsg": {
+    "types": {
+      "allowedTypes": "^[\\w.-/]+: "
+    },
+    "strictTypes": false,
+    "capitalized": false,
+    "subjectPreferredMaxLineLength": false,
+    "subjectMaxLineLength": {
+      "length": 80
+    },
+    "bodyMaxLineLength": {
+      "length": 100
+    },
+    "references": false
+  }
+}
