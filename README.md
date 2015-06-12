@@ -80,9 +80,16 @@ package.json file. Possible configurations are:
 - [any key from the default `config` object](lib/config.js#L8)
 - to turn it off once installed see [disable validation](#disable-validation)
 
-For [an example](test/resources/angular/package.json) check out
-[Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit)
-config file.
+##### Configuration examples
+
+- [Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit) -
+[example](test/resources/angular/package.json)
+- [jQuery's Commit Guidelines](https://contribute.jquery.org/commits-and-pull-requests/#commit-guidelines) -
+[example](test/resources/jquery/package.json)
+- [Gerrit's Commit message guidelines](http://www.mediawiki.org/wiki/Gerrit/Commit_message_guidelines) -
+[example](test/resources/gerrit/package.json)
+- [GNOME's Guidelines for Commit Messages](https://wiki.gnome.org/Git/CommitMessages) -
+[example](test/resources/gnome/package.json)
 
 ## Usage
 
