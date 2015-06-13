@@ -166,7 +166,7 @@ with the following params:
   - `err` (Error)
   - `instance` ([CommitMessage](#commitmessage))
 
-This is the designated initializer.
+This is the designated initializer (also validates the message).
 
 ##### `CommitMessage.parseFromFile(file[, config], callback)`
 
@@ -175,9 +175,7 @@ This is the designated initializer.
 
 ##### `<commitMessageInstance>.message: string`
 
-Return the original message as a string. Note that this will *not* include
-any comments or other text that will not be included in the commit message
-by git, eg. the extra output from `git commit -v`.
+Return the original message as a string.
 
 ##### `<commitMessageInstance>.formattedMessages: string`
 
@@ -190,6 +188,9 @@ as they were generated, including colors.
 after the validation finishes
   - `err` (Error)
   - `instance` ([CommitMessage](#commitmessage))
+
+This is called automatically by the static methods `parse()` and
+`parseFromFile()`.
 
 ##### `<commitMessageInstance>.hasErrors(): boolean`
 
