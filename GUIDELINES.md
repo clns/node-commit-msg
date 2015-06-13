@@ -1,20 +1,25 @@
-# Commit Message Guidelines
+# Commit Guidelines
 
-- [Introduction](#introduction)
+- [Commit Message](#commit-message)
   - [A definitive commit message](#a-definitive-commit-message)
-- [Format](#format)
-  - [Subject](#subject)
-  - [Subject examples](#subject-examples)
-  - [Body](#body)
-  - [Body examples](#body-examples)
+  - [Format](#format)
+    - [Subject](#subject)
+    - [Subject examples](#subject-examples)
+    - [Body](#body)
+    - [Body examples](#body-examples)
+  - [Information in Commit Messages](#information-in-commit-messages)
+    - [The main rule to follow](#the-main-rule-to-follow-is)
 - [Logical Changes](#logical-changes)
   - [Things to avoid when creating commits](#things-to-avoid-when-creating-commits)
   - [The basic rule to follow](#the-basic-rule-to-follow-is)
-- [Information in Commit Messages](#information-in-commit-messages)
-  - [The main rule to follow](#the-main-rule-to-follow-is)
 - [References](#references)
 
-## Introduction
+A commit consists mainly of two things: the change it introduces and
+the commit message. These guidelines ought to demonstrate the value
+in splitting up changes into a sequence of individual commits, and
+the importance of writing good commit messages to go along with them.
+
+## Commit Message
 
 A good commit message should answer three questions:
 
@@ -31,9 +36,6 @@ approach was.
 3. **What effects does the patch have?**  
 In addition to the obvious ones, this may include benchmarks,
 side effects, etc.
-
-Remember: The commit message is mainly for other people, so they
-should be able to understand it now and six months later.
 
 ##### A definitive commit message:
 
@@ -65,7 +67,7 @@ Fixes #5678, fixes #459 (see details at
 https://help.github.com/articles/closing-issues-via-commit-messages/).
 ```
 
-## Format
+### Format
 
 Each commit message consists of a **subject** and a **body**. The subject is
 *required* and must adhere to a more strict set of rules, while the body is
@@ -80,7 +82,7 @@ letters where appropriate.
 
 Note that a *single* blank line should exist between the subject and the body.
 
-### Subject
+#### Subject
 
 The subject contains succinct description of the change and should follow
 these rules:
@@ -103,7 +105,7 @@ the following sentence:
 
 Eg: If applied, this commit will *Fix registration for OS X users*
 
-#### Subject examples
+##### Subject examples
 
 ~~Bad~~ | Good
 --- | ---
@@ -113,7 +115,7 @@ More fixes for broken stuff | Add more fixes for broken stuff
 Changing behavior of X | Change behavior of X
 added more info in the installation guide | Add more info in the installation guide
 
-### Body
+#### Body
 
 The body should include the motivation for the change and any other information
 that can be useful for someone interested in that commit. Additional rules:
@@ -126,7 +128,7 @@ or other "non-prose" explanation
 - can include multiple paragraphs
 - references should be added *only* in the last paragraph
 
-#### Body examples
+##### Body examples
 
 **Bad:**
 
@@ -184,64 +186,7 @@ Adds a template argument to ec2utils.id_to_ec2_id() calls
 Fixes #1013765
 ```
 
-## Logical Changes
-
-The #1 rule for creating good commits is to ensure there is only one
-"logical change" per commit. There are many reasons why this is
-an important rule:
-
-- The smaller the amount of code being changed, the quicker & easier it is
-to review & identify potential flaws.
-- If a change is found to be flawed later, it may be necessary to revert
-the broken commit. This is much easier to do if there are not other
-unrelated code changes entangled with the original commit.
-- When troubleshooting problems using git's bisect capability, small
-well defined changes will aid in isolating exactly where the code
-problem was introduced.
-- When browsing history using git annotate/blame, small well defined
-changes also aid in isolating exactly where & why a piece of code came from.
-
-#### Things to avoid when creating commits
-
-Below are some common examples of bad things to avoid:
-
-- **Mixing whitespace changes with functional code changes.**  
-The whitespace changes will obscure the important functional changes,
-making it harder for a reviewer to correctly determine whether the change
-is correct.  
-**Solution:** Create 2 commits, one with the whitespace changes,
-one with the functional changes. Typically the whitespace change would
-be done first, but that need not be a hard rule.
-
-- **Mixing two unrelated functional changes.**  
-Again the reviewer will find it harder to identify flaws if two unrelated
-changes are mixed together. If it becomes necessary to later revert a
-broken commit, the two unrelated changes will need to be untangled, with
-further risk of bug creation.
-
-- **Sending large new features in a single giant commit.**  
-It may well be the case that the code for a new feature is only useful
-when all of it is present. This does not, however, imply that the entire
-feature should be provided in a single commit. New features often entail
-refactoring existing code. It is highly desirable that any refactoring
-is done in commits which are separate from those implementing the new
-feature. This helps reviewers and test suites validate that the
-refactoring has no unintentional functional changes. Even the newly
-written code can often be split up into multiple pieces that can be
-independently reviewed. For example, changes which add new internal
-APIs/classes, can be in self-contained commits. This allows other
-developers to cherry-pick small parts of the work, if the entire
-new feature is not immediately ready for merge.
-
-##### The basic rule to follow is:
-
-> If a code change can be split into a sequence of patches/commits,
-then it should be split. *Less is not more. More is more.*
-
-You can read more about the
-[Atomic Commit Convention](http://en.wikipedia.org/wiki/Atomic_commit#Atomic_Commit_Convention).
-
-## Information in Commit Messages
+### Information in Commit Messages
 
 The information describing the change in a commit is as important as the
 change itself. When writing commit messages there are some important things
@@ -313,11 +258,71 @@ set changes that don't affect the overall intent of your commit.
 fully understand & review the patch for correctness.
 *Less is not more. More is more.*
 
+Remember: The commit message is mainly for other people, so they
+should be able to understand it now and six months later.
+
+## Logical Changes
+
+The #1 rule for creating good commits is to ensure there is only one
+"logical change" per commit. There are many reasons why this is
+an important rule:
+
+- The smaller the amount of code being changed, the quicker & easier it is
+to review & identify potential flaws.
+- If a change is found to be flawed later, it may be necessary to revert
+the broken commit. This is much easier to do if there are not other
+unrelated code changes entangled with the original commit.
+- When troubleshooting problems using git's bisect capability, small
+well defined changes will aid in isolating exactly where the code
+problem was introduced.
+- When browsing history using git annotate/blame, small well defined
+changes also aid in isolating exactly where & why a piece of code came from.
+
+#### Things to avoid when creating commits
+
+Below are some common examples of bad things to avoid:
+
+- **Mixing whitespace changes with functional code changes.**  
+The whitespace changes will obscure the important functional changes,
+making it harder for a reviewer to correctly determine whether the change
+is correct.  
+**Solution:** Create 2 commits, one with the whitespace changes,
+one with the functional changes. Typically the whitespace change would
+be done first, but that need not be a hard rule.
+
+- **Mixing two unrelated functional changes.**  
+Again the reviewer will find it harder to identify flaws if two unrelated
+changes are mixed together. If it becomes necessary to later revert a
+broken commit, the two unrelated changes will need to be untangled, with
+further risk of bug creation.
+
+- **Sending large new features in a single giant commit.**  
+It may well be the case that the code for a new feature is only useful
+when all of it is present. This does not, however, imply that the entire
+feature should be provided in a single commit. New features often entail
+refactoring existing code. It is highly desirable that any refactoring
+is done in commits which are separate from those implementing the new
+feature. This helps reviewers and test suites validate that the
+refactoring has no unintentional functional changes. Even the newly
+written code can often be split up into multiple pieces that can be
+independently reviewed. For example, changes which add new internal
+APIs/classes, can be in self-contained commits. This allows other
+developers to cherry-pick small parts of the work, if the entire
+new feature is not immediately ready for merge.
+
+##### The basic rule to follow is:
+
+> If a code change can be split into a sequence of patches/commits,
+then it should be split. *Less is not more. More is more.*
+
+You can read more about the
+[Atomic Commit Convention](http://en.wikipedia.org/wiki/Atomic_commit#Atomic_Commit_Convention).
+
 ## References
 
 - Tim Pope's [A Note About Git Commit Messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
 - Git's [Submitting Patches](http://git.kernel.org/cgit/git/git.git/tree/Documentation/SubmittingPatches?id=HEAD) guidelines
 - [Linux kernel suggestion](http://stackoverflow.com/a/11993051/1104534) on SO
 - Linus Torvalds' [commit message guidelines](https://github.com/torvalds/linux/pull/17#issuecomment-5659933)
-- OpenStack's [Git Commit Good Practive](https://wiki.openstack.org/wiki/GitCommitMessages)
+- OpenStack's [Git Commit Good Practice](https://wiki.openstack.org/wiki/GitCommitMessages)
 - Thoughtbot's [5 Useful Tips For A Better Commit Message](https://robots.thoughtbot.com/5-useful-tips-for-a-better-commit-message)
