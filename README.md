@@ -55,7 +55,7 @@ using *administrator* rights.
 Eg. open PowerShell using *Run as administrator*.
 
 ```sh
-npm install commit-msg --save-dev
+npm install commit-msg
 ```
 
 This will also install (symlink) the [commit-msg](bin/commit-msg) hook
