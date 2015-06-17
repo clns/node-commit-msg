@@ -243,27 +243,4 @@ will bypass the *pre-commit* and *commit-msg* hooks.
 
 ## Troubleshooting
 
-### Install errors
-
-##### MSB4019: The imported project "D:\Microsoft.Cpp.Default.props" was not found.
-
-```
-MSB4019: The imported project "D:\Microsoft.Cpp.Default.props" was not found.
-Confirm that the path in the <Import> de claration is correct, and that the file exists on disk.
-gyp ERR! build error
-gyp ERR! stack Error: `C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe` failed with exit code: 1
-...
-npm WARN optional dep failed, continuing java@0.5.4
-```
-
-This is an optional dependency and the validator will work fine without it,
-so you don't need to do anything.
-
-### Commit errors
-
-##### /usr/bin/env: node: No such file or directory
-
-This means that Node.js is not in your PATH, or the program
-you're using to commit doesn't know about it. Try restarting
-the program and if this doesn't fix the issue a log-off
-(or restart) will most likely fix it.
+If you have problems see the [TROUBLESHOOTING](TROUBLESHOOTING.md) page.

@@ -80,9 +80,4 @@ $env:GITHUB_TOKEN='<token>'; npm test
 
 ### Troubleshooting
 
-##### This application requires the legacy Java SE 6 runtime which is unavailable for this version of OS X.
-
-If you encounter this runtime issue when calling java from node.js,
-especially if you're on OS X 10.11 El Capitan, see
-[this issue](https://github.com/joeferner/node-java/issues/223#issuecomment-110408072)
-for a fix.
+If you have problems see the [TROUBLESHOOTING](TROUBLESHOOTING.md) page.
