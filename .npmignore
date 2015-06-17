@@ -3,5 +3,4 @@
 .gitattributes
 .npmignore
 .travis.yml
-CONTRIBUTING.md
-Makefile
+*.md
