@@ -100,8 +100,8 @@ package.json file. Possible configurations are:
 
 ## Usage
 
-A first example is the [commit-msg](bin/commit-msg) hook. For another example
-you can check the [validate](bin/validate) script. For more usages
+A simple example is the [commit-msg](bin/commit-msg) hook. For another
+example you can check the [validate](bin/validate) script. For more usages
 check the [test files](test).
 
 ### Manual validation
@@ -240,6 +240,10 @@ in your package.json file.
 If you know what you're doing you can skip the validation
 altogether using `git commit --no-verify`. Be aware that this
 will bypass the *pre-commit* and *commit-msg* hooks.
+
+## See it in Action
+
+![See it in Action](see-it-in-action.gif)
 
 ## Troubleshooting
 
