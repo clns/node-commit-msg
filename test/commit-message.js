@@ -331,6 +331,7 @@ var nonImperativeCases = [
 describe('CommitMessage', function() {
 
     describe('#parse()', function() {
+        this.timeout(5000); // allow enough time
 
         cases.forEach(function(t) {
             var input = t.raw || t.in.join('\n\n');
