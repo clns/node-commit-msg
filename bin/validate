@@ -110,6 +110,7 @@ function validateFile(files) {
 
 function validateStdin() {
     var command = this;
+    var config = getConfig();
     var rl = readline.createInterface({
         input: process.stdin
     });
@@ -120,7 +121,7 @@ function validateStdin() {
         sha = commits.shift();
         if (!sha) return;
 
-        cmd = util.format('git log --pretty=%B -1 %s', sha);
+        cmd = util.format('git show -s --format=%B %s', sha);
 
         try {
             message = execSync(cmd, {
@@ -146,7 +147,7 @@ function validateStdin() {
             process.exit(1);
         }
 
-        CommitMessage.parse(message, getConfig(), function(err, validator) {
+        CommitMessage.parse(message, config, function(err, validator) {
             if (err) {
                 console.error(err);
                 process.exit(1);
