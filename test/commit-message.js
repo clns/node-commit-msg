@@ -68,7 +68,7 @@ var cases = [
         errors: []
     },
     {
-        describe: 'commit with comments',
+        describe: 'verbose commit',
         raw: 'Amend commit\n\n' +
         '- Fix something\n' +
         '- Change validation\n\n' +
@@ -77,7 +77,16 @@ var cases = [
         '# On branch master\n' +
         '# ------------------------ >8 ------------------------\n' +
         '# Everything below will be removed.\n\n' +
-        'diff ...',
+        'diff --git a/test/references/github.js b/test/references/github.js\n' +
+        'index 5fd1577..59469e6 100644\n' +
+        '--- a/test/references/github.js\n' +
+        '+++ b/test/references/github.js\n' +
+        '//   Property containing the entire matched string; eg. \'Closes #12\' or\n' +
+        '+//   just \'#12\' if no specific keyword was given.\n' +
+        '@@ -44,9 +44,9 @@ describe(\'references/github\', function() {\n' +
+        'assert.equal(issues[12].match, \'pull request #34\');\n' +
+        'assert.equal(issues[13].match, \'pull-request repo#11\');\n' +
+        '});',
         in: ['Amend commit',
         '- Fix something\n' +
         '- Change validation'],
