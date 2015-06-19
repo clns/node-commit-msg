@@ -6,6 +6,7 @@ var path = require('path');
 var CommitMessage = require('..');
 var Config = require('../lib/config');
 var Error = require('../lib/error');
+var GitHubRef = require('../lib/references/github');
 
 var cfg = Config({
     imperativeVerbsInSubject: {
@@ -470,6 +471,30 @@ describe('CommitMessage', function() {
                 assert.equal(validator.hasErrors(), false, failMsg);
                 assert.equal(validator.hasWarnings(), false, failMsg);
 
+                done();
+            });
+        });
+
+        it('custom error message from reference check', function(done) {
+            var input = 'Commit without any reference';
+            var errMsg = 'Commit should include a GitHub reference';
+            var error = new Error(errMsg, Error.ERROR);
+            var parseBak = GitHubRef.parse;
+            GitHubRef.parse = function(text, config) {
+                // Create a fake parse method that returns a single instance
+                // with 'error' set and 'allowInSubject' true.
+                var ref = new GitHubRef(undefined, undefined, undefined, undefined, cfg);
+                ref.error = new Error(errMsg);
+                ref._isPullRequest = true; // fake it to allow in subject
+                ref.isValid = function(cb) { cb(null, false) } // prevent accessing the API for nothing
+                return [ref];
+            }
+            CommitMessage.parse(input, cfg, function(err, validator) {
+                if (err) throw err;
+                GitHubRef.parse = parseBak; // put it back
+
+                assert.deepEqual(validator._errors, [error]);
+                assert.equal(validator.formattedMessages, error.toFormattedString());
                 done();
             });
         });

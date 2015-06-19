@@ -42,12 +42,12 @@ describe('references/github', function() {
         assert.equal(issues[10].match, 'gh-25');
         assert.equal(issues[11].toString(), 'example-user/example_repo.git#42');
         assert.equal(issues[11].match, 'closes example-user/example_repo.git#42');
-        assert.equal(issues[11].isPullRequest, false);
+        assert.equal(issues[11]._isPullRequest, false);
         assert.equal(issues[12].match, 'pull request #34');
         assert(issues[12].allowInSubject);
         assert.equal(issues[13].match, 'pull-request repo#11');
         assert.equal(issues[13]._repo, 'repo');
-        assert(issues[13].isPullRequest);
+        assert(issues[13]._isPullRequest);
     });
 
     it('should validate correctly using the API', function(done) {
