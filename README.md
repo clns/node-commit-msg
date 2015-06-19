@@ -35,9 +35,10 @@ with very compelling reasons.
 
 ## Installation
 
-> Note: This module is currently in active development and a stable v1.0.0
-will be released in a few weeks. Until then, issues will be disabled and
-things might change. For any questions contact me directly.
+> Note: This module is currently in active development (note the 0.x version)
+and a stable v1.0.0 will be released in a few weeks. For this to happen it
+just needs more testing from the community, because the feature set is
+rather complete.
 
 ### Prerequisites
 
@@ -58,7 +59,7 @@ Eg. open PowerShell using *Run as administrator*.
 npm install commit-msg
 ```
 
-This will also install (symlink) the [commit-msg](bin/commit-msg) hook
+This will install (symlink) the [commit-msg](bin/commit-msg) hook
 in your project's `.git/hooks/` directory so you are ready to start committing.
 To disable the auto-install check out [Configuration](#configuration).
 
@@ -100,9 +101,8 @@ package.json file. Possible configurations are:
 
 ## Usage
 
-A simple example is the [commit-msg](bin/commit-msg) hook. For another
-example you can check the [validate](bin/validate) script. For more usages
-check the [test files](test).
+The default usage is through git hooks, so once you installed it in
+your project you're ready to start committing. For other usages see below.
 
 ### Manual validation
 
@@ -147,6 +147,9 @@ git log --oneline --all --no-merges -10 --author='<Author>' | node node_modules/
 For more examples see the script help.
 
 ### API
+
+For some examples you can check out the [commit-msg](bin/commit-msg)
+hook, the [validate](bin/validate) script or the [test files](test).
 
 #### `CommitMessage`
 
@@ -229,6 +232,17 @@ The "error" string.
 ##### `CommitMessage.Error.WARNING: string`
 
 The "warning" string.
+
+### Custom references
+
+You can create your own references by simply putting your reference file
+in the [lib/references](lib/references) directory. Take a look at the
+[github](lib/references/github.js) reference for details on how to
+implement one.
+
+Don't forget to disable the github reference to prevent it from being used.
+To do this specify `references: {github: false}`
+in your package.json file (see [configuration](#configuration)).
 
 ### Disable validation
 
