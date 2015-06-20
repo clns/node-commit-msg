@@ -29,15 +29,18 @@ program
     '    # validate from given file\n' +
     '    node '+executable+' file .git/COMMIT_EDITMSG\n' +
     '    \n' +
+    '    # validate from a list of commit hashes\n' +
+    '    echo "a243d1f 1060ada" | node '+executable+' stdin\n' +
+    '    \n' +
     '    # validate last 5 commits (not including merge commits)\n' +
-    '    git log --oneline --all --no-merges -5 | node '+executable+' stdin\n' +
-    '    git log --oneline --all --since="2 weeks ago" | node '+executable+' stdin\n' +
+    '    git rev-list --all --no-merges -5 | node '+executable+' stdin\n' +
+    '    git rev-list --all --since="2 weeks ago" | node '+executable+' stdin\n' +
     '    # validate last 3 commits and show list of paths each commit modified\n' +
-    '    git log --oneline --all -3 | node '+executable+' stdin -o \'--name-status\'\n' +
+    '    git log --format=%h --all -3 | node '+executable+' stdin -o \'--name-status\'\n' +
     '    # validate all commits made by \'<Author>\' (regex)\n' +
-    '    git log --oneline --all --author=\'<Author>\' | node '+executable+' stdin\n' +
+    '    git rev-list --all --author=\'<Author>\' | node '+executable+' stdin\n' +
     '    # show only commits that have warnings (Unix only)\n' +
-    '    git log --oneline --all | node '+executable+' stdin | grep -B 7 -A 2 \'^warning \'\n' +
+    '    git rev-list --all | node '+executable+' stdin | grep -B 7 -A 2 \'^warning \'\n' +
     '    \n' +
     '    # validate github repositories\n' +
     '    node '+executable+' github clns/node-commit-msg\n' +
@@ -60,7 +63,8 @@ program
 
 program
     .command('stdin')
-    .description('Validate commits read from stdin, one per line; each commit should be from the current directory\'s repository')
+    .description('Validate commit hashes read from stdin, one per line or separated by spaces;\n' +
+        '                               each commit should be from the current directory\'s repository')
     .option('-o, --log-options <options>', 'options to pass to `git-log`, usually for pretty printing', '')
     .action(validateStdin);
 
@@ -158,7 +162,9 @@ function validateStdin() {
     }
 
     rl.on('line', function (line) {
-        commits.push(line.split(' ')[0]);
+        line.split(' ').forEach(function(c) {
+            commits.push(c);
+        });
         if (!started) {
             validateSha();
             started = true;
