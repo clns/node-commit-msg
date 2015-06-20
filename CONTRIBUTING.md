@@ -34,16 +34,17 @@ can send in pull requests.
 
 ##### 2. Install the optional prerequisites
 
-Try to have the optional prerequisites installed. These are needed by
-[node-java](https://github.com/joeferner/node-java) and it greatly improves
-the parser speed (especially when running tests or using the
-[validate](bin/validate) script) because it accesses the parser's API
-directly instead of calling shell commands and having the
-parser load the model each time.
-
 - [Python 2.7](https://www.python.org/downloads/) (Python 3.x is *not* supported)
 - [Java JDK 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 (make sure you have the JDK installed not just JRE)
+
+Try to have the optional prerequisites installed. These are needed by
+[node-java](https://github.com/joeferner/node-java) and it greatly improves
+the parser speed when processing multiple messages in a batch
+(eg. when using the `update` hook, running the tests or validating from
+the command line) because it accesses the parser's API
+directly instead of calling shell commands and having the
+parser load the model each time.
 
 ##### 3. Install dependencies
 
