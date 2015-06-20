@@ -1,0 +1,137 @@
+#!/usr/bin/env node
+
+// clns/node-commit-msg
+// http://git-scm.com/docs/githooks#update
+
+var path = require('path');
+var spawn = require('child_process').spawn;
+var exec = require('child_process').exec;
+var util = require('util');
+var CommitMessage = require('..');
+
+// Vars
+var refname = process.argv[2];
+var oldrev  = process.argv[3];
+var newrev  = process.argv[4];
+
+// Safety check
+if (!process.env.GIT_DIR) {
+    console.error('Don\'t run this script from the command line.\n' +
+        ' (if you want, you could supply GIT_DIR then run\n' +
+        '  %s <ref> <oldrev> <newrev>)',
+        process.argv[1]);
+    process.exit(1);
+}
+
+if (!refname || !oldrev || !newrev) {
+    console.error('usage: %s <ref> <oldrev> <newrev>', process.argv[1]);
+    process.exit(1);
+}
+
+// Configurations
+var defaultConfig = CommitMessage.Config(config);
+config = CommitMessage.Config(
+    CommitMessage.resolveConfigSync(process.env.GIT_DIR),
+    defaultConfig
+);
+var showFirst = config.updateHook.showFirst; // show first X commits with errors
+var config = { // validator default config (can be overwritten by package.json)
+    subjectPreferredMaxLineLength: false,
+    bodyMaxLineLength: false,
+    squashFixup: {allow: false}
+};
+
+// Process a commit
+var processing = false;
+var hashes = [];
+var errors = []; // contains all short hashes that failed validation
+var hash, shortHash, subject, idx, idx2;
+var firstFew = []; // contains output lines for the first 'showFirst' commits with errors
+var processCommit = function() {
+    if (processing) return;
+
+    hash = hashes.shift();
+    if (!hash) {
+        processing = false;
+        return;
+    }
+
+    exec(util.format('git show -s --format=%s %s', '%h%n%s%n%B', hash), {
+        cwd: process.env.GIT_DIR
+    }, function(err, stdout) {
+        if (err) {
+            console.error(err);
+            process.exit(1);
+        }
+
+        idx = stdout.indexOf('\n');
+        idx2 = stdout.indexOf('\n', idx+1);
+        shortHash = stdout.substring(0, idx+1).slice(0, -1);
+        subject = stdout.substring(idx+1, idx2+1).slice(0, -1);
+        stdout = stdout.slice(idx2+1);
+
+        CommitMessage.parse(stdout, config, function(err, validator) {
+            if (err) {
+                console.error(err);
+                process.exit(1);
+            }
+            stdout = null;
+            if (validator.hasErrors()) {
+                errors.push(shortHash);
+            }
+            if (errors.length <= showFirst && (validator.hasErrors() || validator.hasWarnings())) {
+                firstFew.push(util.format(
+                    '%s: %s\n' +
+                    '%s',
+                    shortHash, subject,
+                    validator.formattedMessages
+                ));
+            }
+            validator = null;
+            processing = false;
+            processCommit(); // continue
+        });
+    });
+}
+
+// Process commits in the range <oldrev>..<newrev> or just <newrev>
+var range = util.format('%s%s', parseInt(oldrev)?(oldrev+'..'):'', newrev);
+var proc = spawn('git', ['rev-list', range], {
+    cwd: process.env.GIT_DIR
+});
+
+proc.stdout.on('data', function(data) {
+    data.toString('utf8').split('\n').forEach(function(c) {
+        hashes.push(c);
+    });
+    processCommit();
+});
+
+proc.stderr.on('data', function(data) {
+    console.error(data.toString('utf8'));
+});
+
+proc.on('close', function(code) {
+    code === 0 || process.exit(code);
+});
+
+process.on('beforeExit', function() {
+    if (errors.length) {
+        var msg = errors.length == 1 ? '1 commit' :
+            util.format('%d commits', errors.length);
+        console.log(
+            '%s failed on %s due to invalid commit message%s',
+            msg,
+            refname,
+            firstFew.length && firstFew.length!=errors.length ?
+                util.format('; showing the last %s ...', (firstFew.length==1?'one':firstFew.length)) :
+                ''
+        );
+        firstFew.length && console.log(firstFew.join('\n'));
+        console.log('You can run this command in your project root to see all the error messages:');
+        console.log('  $ echo "%s" | node node_modules/commit-msg/bin/validate stdin',
+            errors.join(' '));
+        // https://nodejs.org/api/process.html#process_exit_codes
+        process.exit(1); // Uncaught Fatal Exception
+    }
+});
