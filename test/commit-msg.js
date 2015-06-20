@@ -1,8 +1,13 @@
 'use strict';
 
+// Tests the 'commit-msg' hook
+
 var assert = require('assert');
 var path = require('path');
 var execFileSync = require('child_process').execFileSync;
+var execSync = require('child_process').execSync;
+var fs = require('fs');
+var g = require('./global-hooks');
 
 var root = path.resolve(__dirname, '..');
 var hook = path.relative(root, 'bin/commit-msg');
@@ -41,6 +46,19 @@ describe('commig-msg', function() {
                 function(e) {
                     return e.status === 1;
                 }
+            );
+        });
+
+        it('should reject an invalid commit', function() {
+            var repo = g.clone1;
+            fs.writeFileSync(path.join(repo, 'invalid-commit.txt'), 'added by the commit-msg test ' + new Date().getTime());
+
+            assert.throws(
+                function() {
+                    execSync('git add .; git commit -m "Add invalid commit."', {cwd: repo, stdio: [null]});
+                },
+                null,
+                'Needs \'setup\' test suite to run before this'
             );
         });
     });
