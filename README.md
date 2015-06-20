@@ -35,7 +35,7 @@ with very compelling reasons.
 
 ## Installation
 
-> Note: This module is currently in active development (note the 0.x version)
+> Note: This module is currently in active development (hence the 0.x version)
 and a stable v1.0.0 will be released in a few weeks. For this to happen it
 just needs more testing from the community, because the feature set is
 rather complete.
@@ -48,10 +48,9 @@ or newer (required by the parser)
 
 ### Install
 
-The commands below should be run from your project's root
-directory (where `.git` is).
+The commands below should be run from your project's root directory.
 
-> IMPORTANT: On Windows, make sure you run the commands below
+> IMPORTANT: On Windows, make sure you run the commands
 using *administrator* rights.
 Eg. open PowerShell using *Run as administrator*.
 
@@ -59,9 +58,11 @@ Eg. open PowerShell using *Run as administrator*.
 npm install commit-msg
 ```
 
-This will install (symlink) the [commit-msg](bin/commit-msg) hook
-in your project's `.git/hooks/` directory so you are ready to start committing.
-To disable the auto-install check out [Configuration](#configuration).
+This will install (symlink) the [`commit-msg`](bin/commit-msg)
+and [`update`](bin/update) hooks in your repo's `hooks/`
+directory so you are ready to start committing. If any of these hooks
+already exist, a message will be displayed and the hooks will remain untouched.
+To disable the hooks installation see [Configuration](#configuration).
 
 ##### Global install
 
@@ -84,25 +85,78 @@ npm uninstall commit-msg
 You can configure this module by specifying a `commitMsg` key in your
 package.json file. Possible configurations are:
 
-- `noHook` (Boolean) Set to `true` to disable the git hook auto-install
 - [any key from the default `config` object](lib/config.js#L8)
-- to turn it off once installed see [disable validation](#disable-validation)
+- to turn off the validator once installed with hooks see
+[disable validation](#disable-validation)
+- to disable the hooks auto-install see
+[disable hooks auto-install](#disable-hooks-auto-install)
 
 ##### Configuration examples
 
 - [Angular's Git Commit Guidelines](https://github.com/angular/angular.js/blob/master/CONTRIBUTING.md#commit) -
-[example](test/resources/angular/package.json)
+[example file](test/resources/angular/package.json)
 - [jQuery's Commit Guidelines](https://contribute.jquery.org/commits-and-pull-requests/#commit-guidelines) -
-[example](test/resources/jquery/package.json)
+[example file](test/resources/jquery/package.json)
 - [Gerrit's Commit message guidelines](http://www.mediawiki.org/wiki/Gerrit/Commit_message_guidelines) -
-[example](test/resources/gerrit/package.json)
+[example file](test/resources/gerrit/package.json)
 - [GNOME's Guidelines for Commit Messages](https://wiki.gnome.org/Git/CommitMessages) -
-[example](test/resources/gnome/package.json)
+[example file](test/resources/gnome/package.json)
+
+#### Disable hooks auto-install
+
+You can disable the hooks installation in 2 ways:
+
+1. Set the `no[Client|Server]Hook` key to true in your package.json:
+
+  ```json
+  {
+    "commitMsg": {
+      "noClientHook": true,
+      "noServerHook": true
+    }
+  }
+  ```
+
+2. Set the `commitMsg.no[Client|Server]Hook` key to true in `git config`:
+
+  ```sh
+  git config commitMsg.noClientHook true
+  git config commitMsg.noServerHook true
+  ```
+
+#### Disable validation
+
+You can disable the validation by setting `commitMsg: {disable: true, ...}`
+in your package.json file.
+
+#### Bypass validation
+
+If you know what you're doing you can skip the validation
+altogether using `git commit --no-verify`. Be aware that this
+will bypass the *pre-commit* and *commit-msg* hooks.
 
 ## Usage
 
-The default usage is through git hooks, so once you installed it in
-your project you're ready to start committing. For other usages see below.
+The default usage is through git hooks, that install automatically
+when you install the module in a git repository. There are also other
+possible usages, explained below.
+
+### Client-side hook
+
+On the client side the [`commit-msg`](bin/commit-msg) hook validates
+every commit you make, helping you follow the guidelines possibly
+enforced by the remote server you're pushing to.
+
+### Server-side hook
+
+The [`update`](bin/update) hook can be installed in a (bare) repository
+on a remote server to enforce your own commit message guidelines.
+
+##### A note on performance
+
+> To greatly improve the validation speed make sure you have the
+[optional prerequisites](CONTRIBUTING.md#2-install-the-optional-prerequisites)
+installed.
 
 ### Manual validation
 
@@ -119,11 +173,7 @@ node node_modules/commit-msg/bin/validate -h
 Examples below assume the module is installed at `node_modules/commit-msg`
 in your project root.
 
-##### A note on performance
-
-> To greatly improve the script speed make sure you have the
-[optional prerequisites](CONTRIBUTING.md#2-install-the-optional-prerequisites)
-installed.
+Also see [a note on performance](#a-note-on-performance).
 
 ##### Validate any given message(s)
 
@@ -145,6 +195,17 @@ git rev-list --all --no-merges -10 --author='<Author>' | node node_modules/commi
 ```
 
 For more examples see the script help.
+
+### Custom references
+
+You can create your own references by simply putting your reference file
+in the [lib/references](lib/references) directory. Take a look at the
+[github](lib/references/github.js) reference for details on how to
+implement one.
+
+Don't forget to disable the github reference to prevent it from being used.
+To do this specify `references: {github: false}`
+in your package.json file (see [configuration](#configuration)).
 
 ### API
 
@@ -232,28 +293,6 @@ The "error" string.
 ##### `CommitMessage.Error.WARNING: string`
 
 The "warning" string.
-
-### Custom references
-
-You can create your own references by simply putting your reference file
-in the [lib/references](lib/references) directory. Take a look at the
-[github](lib/references/github.js) reference for details on how to
-implement one.
-
-Don't forget to disable the github reference to prevent it from being used.
-To do this specify `references: {github: false}`
-in your package.json file (see [configuration](#configuration)).
-
-### Disable validation
-
-You can disable the validation by setting `commitMsg: {disable: true, ...}`
-in your package.json file.
-
-### Bypass validation
-
-If you know what you're doing you can skip the validation
-altogether using `git commit --no-verify`. Be aware that this
-will bypass the *pre-commit* and *commit-msg* hooks.
 
 ## See it in Action
 
