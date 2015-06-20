@@ -52,10 +52,11 @@ describe('commig-msg', function() {
         it('should reject an invalid commit', function() {
             var repo = g.clone1;
             fs.writeFileSync(path.join(repo, 'invalid-commit.txt'), 'added by the commit-msg test ' + new Date().getTime());
+            execSync('git add invalid-commit.txt', {cwd: repo, stdio: 'ignore'});
 
             assert.throws(
                 function() {
-                    execSync('git add .; git commit -m "Add invalid commit."', {cwd: repo, stdio: [null]});
+                    execSync('git commit -m "Add invalid commit."', {cwd: repo, stdio: 'ignore'});
                 },
                 null,
                 'Needs \'setup\' test suite to run before this'

@@ -35,13 +35,16 @@ describe('setup', function() {
 
             // mask 1=can execute, 4=can read, 2=can write
             // http://stackoverflow.com/a/11781404/1104534
-            var mask = 1;
-            stats = fs.statSync(commitMsgHook);
-            canExecute = !!(mask & parseInt ((stats.mode & parseInt ("777", 8)).toString (8)[0]));
-            assert(canExecute, 'commit-msg is not executable');
-            stats = fs.statSync(updateHook);
-            canExecute = !!(mask & parseInt ((stats.mode & parseInt ("777", 8)).toString (8)[0]));
-            assert(canExecute, 'update is not executable');
+            var isWin = /^win/.test(process.platform);
+            if (!isWin) {
+                var mask = 1;
+                stats = fs.statSync(commitMsgHook);
+                canExecute = !!(mask & parseInt ((stats.mode & parseInt ("777", 8)).toString (8)[0]));
+                assert(canExecute, 'commit-msg is not executable');
+                stats = fs.statSync(updateHook);
+                canExecute = !!(mask & parseInt ((stats.mode & parseInt ("777", 8)).toString (8)[0]));
+                assert(canExecute, 'update is not executable');
+            }
         });
 
         it('should install in a bare repository', function() {
