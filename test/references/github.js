@@ -16,7 +16,7 @@ describe('references/github', function() {
     });
 
     it('should parse correctly', function() {
-        var issues = new Issue.parse('Commit with issue references\n\n' +
+        var issues = Issue.parse('Commit with issue references\n\n' +
         'Resolve clns/node-commit-msg#1, and resolved #2 and resolves #11-3\n' +
         'Fix #45, fixed example-repo.git#34;\n' +
         'Close #74, fixes #45\n' +
@@ -59,7 +59,7 @@ describe('references/github', function() {
         }
         cfg = Config(cfg);
 
-        var issues = new Issue.parse('Validate issue references using APIs\n\n' +
+        var issues = Issue.parse('Validate issue references using APIs\n\n' +
         'Resolve #99999 and resolves github/hub#11-3\n' +
         'Fix smooth-drawing#1 and pull request github/hub#57.', cfg);
         var ct = 0;
