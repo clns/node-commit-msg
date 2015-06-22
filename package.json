@@ -3,7 +3,10 @@
   "version": "0.1.1",
   "description": "Git commit message validator",
   "main": "./lib/commit-message.js",
-  "bin": "./bin/validate",
+  "bin": {
+    "commit-msg": "./bin/validate",
+    "git-commit-msg": "./bin/git-commit-msg"
+  },
   "scripts": {
     "hook": "node lib/setup",
     "hook-uninstall": "node lib/setup uninstall",
