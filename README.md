@@ -147,6 +147,9 @@ On the client side the [`commit-msg`](bin/commit-msg) hook validates
 every commit you make, helping you follow the guidelines possibly
 enforced by the remote server you're pushing to.
 
+If you get your commits rejected by the server, see
+[Changing commit messages](CHANGE-MSG.md).
+
 ### Server-side hook
 
 The [`update`](bin/update) hook can be installed in a (bare) repository
