@@ -5,6 +5,25 @@ written in Node.js. It validates a given string based on
 [best practices](GUIDELINES.md) and can be used as a git hook,
 command line tool and/or directly through the API.
 
+- [Default validations](#default-validations)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Install](#install)
+  - [Update](#update)
+  - [Uninstall](#uninstall)
+- [Configuration](#configuration)
+  - [Disable hooks auto-install](#disable-hooks-auto-install)
+  - [Disable validation](#disable-validation)
+  - [Bypass validation](#bypass-validation)
+- [Usage](#usage)
+  - [Client-side hook](#client-side-hook)
+  - [Server-side hook](#server-side-hook)
+  - [Manual validation](#manual-validation)
+  - [Custom references](#custom-references)
+  - [API](#api)
+- [See it in Action](#see-it-in-action)
+- [Troubleshooting](#troubleshooting)
+
 ### Default validations
 
 - Subject and body should be separated by an empty line, if body exists
