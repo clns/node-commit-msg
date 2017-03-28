@@ -49,6 +49,6 @@
     "semver": "^4.3.3"
   },
   "optionalDependencies": {
-    "java": "^0.5.4"
+    "java": "^0.6.1"
   }
 }
