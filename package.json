@@ -38,15 +38,15 @@
     "node": ">=0.12"
   },
   "devDependencies": {
-    "coveralls": "^2.11.2",
-    "istanbul": "^0.3.13",
-    "mocha": "^2.2.4"
+    "coveralls": "^3.0.2",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.2.0"
   },
   "dependencies": {
-    "chalk": "^1.0.0",
-    "clone": "^1.0.2",
-    "commander": "^2.8.1",
-    "semver": "^4.3.3"
+    "chalk": "^2.4.1",
+    "clone": "^2.1.2",
+    "commander": "^2.19.0",
+    "semver": "^5.6.0"
   },
   "optionalDependencies": {
     "java": "latest"
