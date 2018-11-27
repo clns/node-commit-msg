@@ -300,4 +300,8 @@ process.on('beforeExit', function() {
     console.log('- %d% success rate and %d% warnings',
         totalCommits ? Math.ceil(validCommits / totalCommits * 100) : 0,
         totalCommits ? Math.ceil(commitsWithWarn / totalCommits * 100) : 0);
+
+    if(totalCommits !== validCommits){
+      process.exit(10);
+    }
 });
